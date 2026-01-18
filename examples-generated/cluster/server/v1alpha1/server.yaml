@@ -1,0 +1,16 @@
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/server
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+spec:
+  forProvider:
+    image: debian-12
+    name: node1
+    publicNet:
+    - ipv4Enabled: true
+      ipv6Enabled: true
+    serverType: cx23

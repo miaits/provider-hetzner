@@ -1,40 +1,1480 @@
-name: hashicorp/null
+name: hetznercloud/hcloud
 resources:
-    null_resource:
+    hcloud_certificate:
         subCategory: ""
-        description: The null_resource resource implements the standard resource lifecycle but takes no further action. On Terraform 1.4 and later, use the terraform_data resource type https://developer.hashicorp.com/terraform/language/resources/terraform-data instead. Terraform 1.9 and later support the moved configuration block from null_resource to terraform_data. The triggers argument allows specifying an arbitrary set of values that, when changed, will cause the resource to be replaced.
-        name: null_resource
-        title: null_resource Resource - terraform-provider-null
+        description: Provides a Hetzner Cloud Certificate to represent a TLS certificate in the Hetzner Cloud.
+        name: hcloud_certificate
+        title: hcloud_certificate
+        argumentDocs: {}
+        importStatements: []
+    hcloud_firewall:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Firewall to represent a Firewall in the Hetzner Cloud.
+        name: hcloud_firewall
+        title: hcloud_firewall
         examples:
-            - name: cluster
+            - name: myfirewall
               manifest: |-
                 {
-                  "connection": [
+                  "name": "my-firewall",
+                  "rule": [
                     {
-                      "host": "${element(aws_instance.cluster[*].public_ip, 0)}"
+                      "direction": "in",
+                      "protocol": "icmp",
+                      "source_ips": [
+                        "0.0.0.0/0",
+                        "::/0"
+                      ]
+                    },
+                    {
+                      "direction": "in",
+                      "port": "80-85",
+                      "protocol": "tcp",
+                      "source_ips": [
+                        "0.0.0.0/0",
+                        "::/0"
+                      ]
                     }
-                  ],
-                  "provisioner": {
-                    "remote-exec": [
-                      {
-                        "inline": [
-                          "bootstrap-cluster.sh ${join(\" \",\n      aws_instance.cluster[*].private_ip)}"
-                        ]
-                      }
-                    ]
-                  },
-                  "triggers": {
-                    "cluster_instance_ids": "${join(\",\", aws_instance.cluster[*].id)}"
-                  }
+                  ]
                 }
               dependencies:
-                aws_instance.cluster: |-
+                hcloud_server.node1: |-
                     {
-                      "ami": "ami-0dcc1e21636832c5d",
-                      "count": 3,
-                      "instance_type": "m5.large"
+                      "firewall_ids": [
+                        "${hcloud_firewall.myfirewall.id}"
+                      ],
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
                     }
         argumentDocs:
-            id: (String) This is set to a random value at create time.
-            triggers: (Map of String) A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-        importStatements: []
+            apply_to: (Optional) Resources the firewall should be assigned to
+            description: '- (Optional, string) Description of the firewall rule'
+            destination_ips: |-
+                - (Required, List) List of IPs or CIDRs that are allowed within this Firewall Rule (when direction
+                is out)
+            direction: '- (Required, string) Direction of the Firewall Rule. in'
+            id: '- (int) Unique ID of the Firewall.'
+            label_selector: |-
+                - (Optional, string) Label Selector to select servers the firewall should be applied to (only one
+                of server and label_selectorcan be applied in one block)
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            name: '- (Optional, string) Name of the Firewall.'
+            port: |-
+                - (Required, string) Port of the Firewall Rule. Required when protocol is tcp or udp. You can use any
+                to allow all ports for the specific protocol. Port ranges are also possible: 80-85 allows all ports between 80 and 85.
+            protocol: '- (Required, string) Protocol of the Firewall Rule. tcp, icmp, udp, gre, esp'
+            rule: '- (Optional) Configuration of a Rule from this Firewall.'
+            server: |-
+                - (Optional, int) ID of the server you want to apply the firewall to (only one of server
+                and label_selectorcan be applied in one block)
+            source_ips: |-
+                - (Required, List) List of IPs or CIDRs that are allowed within this Firewall Rule (when direction
+                is in)
+        importStatements:
+            - terraform import hcloud_firewall.example "$FIREWALL_ID"
+    hcloud_firewall_attachment:
+        subCategory: ""
+        description: Attaches resources to a Hetzner Cloud Firewall.
+        name: hcloud_firewall_attachment
+        title: hcloud_firewall_attachment
+        examples:
+            - name: fw_ref
+              manifest: |-
+                {
+                  "firewall_id": "${hcloud_firewall.basic_firewall.id}",
+                  "server_ids": [
+                    "${hcloud_server.test_server.id}"
+                  ]
+                }
+              references:
+                firewall_id: hcloud_firewall.basic_firewall.id
+                server_ids: hcloud_server.test_server.id
+              dependencies:
+                hcloud_firewall.basic_firewall: |-
+                    {
+                      "name": "basic_firewall"
+                    }
+                hcloud_server.test_server: |-
+                    {
+                      "image": "ubuntu-24.04",
+                      "name": "test-server",
+                      "server_type": "cx23"
+                    }
+            - name: fw_ref
+              manifest: |-
+                {
+                  "firewall_id": "${hcloud_firewall.basic_firewall.id}",
+                  "label_selectors": [
+                    "firewall-attachment=test-server"
+                  ]
+                }
+              references:
+                firewall_id: hcloud_firewall.basic_firewall.id
+              dependencies:
+                hcloud_firewall.basic_firewall: |-
+                    {
+                      "name": "basic_firewall"
+                    }
+                hcloud_server.test_server: |-
+                    {
+                      "image": "ubuntu-24.04",
+                      "labels": {
+                        "firewall-attachment": "test-server"
+                      },
+                      "name": "test-server",
+                      "server_type": "cx23"
+                    }
+            - name: deny_all_att
+              manifest: |-
+                {
+                  "firewall_id": "${hcloud_firewall.deny_all.id}",
+                  "server_ids": [
+                    "${hcloud_server.test_server.id}"
+                  ]
+                }
+              references:
+                firewall_id: hcloud_firewall.deny_all.id
+                server_ids: hcloud_server.test_server.id
+              dependencies:
+                hcloud_firewall.allow_rules: |-
+                    {
+                      "name": "allow_rules",
+                      "rule": [
+                        {
+                          "destination_ips": [
+                            "${format(\"%s/32\", hcloud_server.test_server.ipv4_address)}"
+                          ],
+                          "direction": "in",
+                          "port": "22",
+                          "protocol": "tcp",
+                          "source_ips": [
+                            "0.0.0.0/0",
+                            "::/0"
+                          ]
+                        }
+                      ]
+                    }
+                hcloud_firewall.deny_all: |-
+                    {
+                      "name": "deny_all"
+                    }
+                hcloud_server.test_server: |-
+                    {
+                      "firewall_ids": [
+                        "${hcloud_firewall.deny_all.id}"
+                      ],
+                      "ignore_remote_firewall_ids": true,
+                      "image": "ubuntu-24.04",
+                      "name": "test-server",
+                      "server_type": "cx23"
+                    }
+            - name: allow_rules_att
+              manifest: |-
+                {
+                  "firewall_id": "${hcloud_firewall.allow_rules.id}",
+                  "server_ids": [
+                    "${hcloud_server.test_server.id}"
+                  ]
+                }
+              references:
+                firewall_id: hcloud_firewall.allow_rules.id
+                server_ids: hcloud_server.test_server.id
+              dependencies:
+                hcloud_firewall.allow_rules: |-
+                    {
+                      "name": "allow_rules",
+                      "rule": [
+                        {
+                          "destination_ips": [
+                            "${format(\"%s/32\", hcloud_server.test_server.ipv4_address)}"
+                          ],
+                          "direction": "in",
+                          "port": "22",
+                          "protocol": "tcp",
+                          "source_ips": [
+                            "0.0.0.0/0",
+                            "::/0"
+                          ]
+                        }
+                      ]
+                    }
+                hcloud_firewall.deny_all: |-
+                    {
+                      "name": "deny_all"
+                    }
+                hcloud_server.test_server: |-
+                    {
+                      "firewall_ids": [
+                        "${hcloud_firewall.deny_all.id}"
+                      ],
+                      "ignore_remote_firewall_ids": true,
+                      "image": "ubuntu-24.04",
+                      "name": "test-server",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            firewall_id: |-
+                - (Required, int) ID of the firewall the resources
+                should be attached to.
+            id: (int) - Unique ID representing this hcloud_firewall_attachment.
+            label_selectors: |-
+                - (Optional, List) List of label selectors used to
+                select resources to attach to the firewall.
+            server_ids: |-
+                - (Optional, List) List of Server IDs to attach to the
+                firewall.
+        importStatements:
+            - terraform import hcloud_firewall_attachment.example "$FIREWALL_ID"
+    hcloud_floating_ip:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Floating IP to represent a publicly-accessible static IP address that can be mapped to one of your servers.
+        name: hcloud_floating_ip
+        title: hcloud_floating_ip
+        examples:
+            - name: master
+              manifest: |-
+                {
+                  "server_id": "${hcloud_server.node1.id}",
+                  "type": "ipv4"
+                }
+              references:
+                server_id: hcloud_server.node1.id
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            delete_protection: '- (Optional, bool) Enable or disable delete protection. See "Delete Protection" in the Provider Docs for details.'
+            description: '- (Optional, string) Description of the Floating IP.'
+            home_location: '- (Optional, string) Name of home location (routing is optimized for that location). Optional if server_id argument is passed.'
+            id: '- (int) Unique ID of the Floating IP.'
+            ip_address: '- (string) IP Address of the Floating IP.'
+            ip_network: '- (string) IPv6 subnet. (Only set if type is ipv6)'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            name: '- (Optional, string) Name of the Floating IP.'
+            server_id: '- (Optional, int) Server to assign the Floating IP to. Optional if home_location argument is passed.'
+            type: '- (Required, string) Type of the Floating IP. ipv4 ipv6'
+        importStatements:
+            - terraform import hcloud_floating_ip.example "$FLOATING_IP_ID"
+    hcloud_floating_ip_assignment:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Floating IP Assignment to assign a Floating IP to a Hetzner Cloud Server.
+        name: hcloud_floating_ip_assignment
+        title: hcloud_floating_ip_assignment
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "floating_ip_id": "${hcloud_floating_ip.master.id}",
+                  "server_id": "${hcloud_server.node1.id}"
+                }
+              references:
+                floating_ip_id: hcloud_floating_ip.master.id
+                server_id: hcloud_server.node1.id
+              dependencies:
+                hcloud_floating_ip.master: |-
+                    {
+                      "home_location": "nbg1",
+                      "type": "ipv4"
+                    }
+                hcloud_server.node1: |-
+                    {
+                      "datacenter": "fsn1-dc8",
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            floating_ip_id: '- (Required, int) ID of the Floating IP.'
+            id: '- (int) Unique ID of the Floating IP Assignment.'
+            server_id: '- (Required, int) Server to assign the Floating IP to.'
+        importStatements:
+            - terraform import hcloud_floating_ip_assignment.example "$FLOATING_IP_ID"
+    hcloud_load_balancer:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Load Balancer to represent a Load Balancer in the Hetzner Cloud.
+        name: hcloud_load_balancer
+        title: hcloud_load_balancer
+        examples:
+            - name: load_balancer
+              manifest: |-
+                {
+                  "load_balancer_type": "lb11",
+                  "location": "nbg1",
+                  "name": "my-load-balancer"
+                }
+              dependencies:
+                hcloud_load_balancer_target.load_balancer_target: |-
+                    {
+                      "load_balancer_id": "${hcloud_load_balancer.load_balancer.id}",
+                      "server_id": "${hcloud_server.my_server.id}",
+                      "type": "server"
+                    }
+                hcloud_server.my_server: |-
+                    {
+                      "image": "ubuntu-24.04",
+                      "name": "server-%d",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            algorithm: '- (Optional) Configuration of the algorithm the Load Balancer use.'
+            delete_protection: '- (Optional, bool) Enable or disable delete protection. See "Delete Protection" in the Provider Docs for details.'
+            id: '- (int) Unique ID of the Load Balancer.'
+            ipv4: '- (string) IPv4 Address of the Load Balancer.'
+            ipv6: '- (string) IPv6 Address of the Load Balancer.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            load_balancer_type: '- (Required, string) Type of the Load Balancer.'
+            location: '- (Optional, string) The location name of the Load Balancer. Require when no network_zone is set. See the Hetzner Docs for more details about locations.'
+            name: '- (Required, string) Name of the Load Balancer.'
+            network_id: '- (int) ID of the first private network that this Load Balancer is connected to.'
+            network_ip: '- (string) IP of the Load Balancer in the first private network that it is connected to.'
+            network_zone: '- (Optional, string) The Network Zone of the Load Balancer. Require when no location is set.'
+            type: '- (Required, string) Type of the Load Balancer Algorithm. round_robin or least_connections'
+        importStatements:
+            - terraform import hcloud_load_balancer.example "$LOAD_BALANCER_ID"
+    hcloud_load_balancer_network:
+        subCategory: ""
+        description: Manage the attachment of a Load Balancer in a Network in the Hetzner Cloud.
+        name: hcloud_load_balancer_network
+        title: hcloud_load_balancer_network Resource - hcloud
+        examples:
+            - name: attachment
+              manifest: |-
+                {
+                  "ip": "10.0.1.5",
+                  "load_balancer_id": "${hcloud_load_balancer.main.id}",
+                  "subnet_id": "${hcloud_network_subnet.subnet.id}"
+                }
+              references:
+                load_balancer_id: hcloud_load_balancer.main.id
+                subnet_id: hcloud_network_subnet.subnet.id
+              dependencies:
+                hcloud_load_balancer.main: |-
+                    {
+                      "load_balancer_type": "lb11",
+                      "name": "main",
+                      "network_zone": "eu-central"
+                    }
+                hcloud_network.network: |-
+                    {
+                      "ip_range": "10.0.0.0/16",
+                      "name": "network"
+                    }
+                hcloud_network_subnet.subnet: |-
+                    {
+                      "ip_range": "10.0.1.0/24",
+                      "network_id": "${hcloud_network.network.id}",
+                      "network_zone": "eu-central",
+                      "type": "cloud"
+                    }
+        argumentDocs:
+            enable_public_interface: (Boolean) Wether the Load Balancer public interface is enabled. Default is true.
+            id: (String) The ID of this resource.
+            ip: (String) IP to assign to the Load Balancer.
+            load_balancer_id: (Number) ID of the Load Balancer.
+            network_id: (Number) ID of the Network to attach the Load Balancer to. Using subnet_id is preferred. Required if subnet_id is not set. If subnet_id or ip are not set, the Load Balancer will be attached to the last subnet (ordered by ip_range).
+            subnet_id: (String) ID of the Subnet to attach the Load Balancer to. Required if network_id is not set.
+        importStatements:
+            - terraform import hcloud_load_balancer_network.example "$LOAD_BALANCER_ID-$NETWORK_ID"
+    hcloud_load_balancer_service:
+        subCategory: ""
+        description: Define services for Hetzner Cloud Load Balancers.
+        name: hcloud_load_balancer_service
+        title: hcloud_load_balancer_service
+        examples:
+            - name: load_balancer_service
+              manifest: |-
+                {
+                  "health_check": [
+                    {
+                      "http": [
+                        {
+                          "domain": "example.com",
+                          "path": "/healthz",
+                          "response": "OK",
+                          "status_codes": [
+                            "200"
+                          ],
+                          "tls": true
+                        }
+                      ],
+                      "interval": 10,
+                      "port": 80,
+                      "protocol": "http",
+                      "timeout": 5
+                    }
+                  ],
+                  "http": [
+                    {
+                      "cookie_name": "EXAMPLE_STICKY",
+                      "sticky_sessions": true
+                    }
+                  ],
+                  "load_balancer_id": "${hcloud_load_balancer.load_balancer.id}",
+                  "protocol": "http"
+                }
+              references:
+                load_balancer_id: hcloud_load_balancer.load_balancer.id
+              dependencies:
+                hcloud_load_balancer.load_balancer: |-
+                    {
+                      "load_balancer_type": "lb11",
+                      "location": "nbg1",
+                      "name": "my-load-balancer"
+                    }
+        argumentDocs:
+            certificates: '- (Optional, list[int]) List of IDs from certificates which the Load Balancer has.'
+            cookie_lifetime: '- (Optional, int) Lifetime of the cookie for sticky session (in seconds). Default: 300'
+            cookie_name: '- (Optional, string) Name of the cookie for sticky session. Default: HCLBSTICKY'
+            destination_port: '- (Optional, int) Port the service connects to the targets on, required if protocol is tcp. Can be everything between 1 and 65535.'
+            domain: '- (Optional, string) Domain we try to access when performing the Health Check.'
+            health_check: '- (Optional, block) Health Check configuration when protocol is http or https.'
+            http: '- (Optional, block) HTTP configuration when protocol is http or https.'
+            interval: '- (Required, int) Interval how often the health check will be performed, in seconds.'
+            listen_port: '- (Optional, int) Port the service listen on, required if protocol is tcp. Can be everything between 1 and 65535. Must be unique per Load Balancer.'
+            load_balancer_id: '- (Required, int) Id of the load balancer this service belongs to.'
+            path: '- (Optional, string) Path we try to access when performing the Health Check.'
+            port: '- (Required, int) Port the health check tries to connect to, required if protocol is tcp. Can be everything between 1 and 65535. Must be unique per Load Balancer.'
+            protocol: '- (Required, string) Protocol of the service. http, https or tcp'
+            proxyprotocol: '- (Optional, bool) Enable proxyprotocol.'
+            redirect_http: '- (Optional, bool) Redirect HTTP to HTTPS traffic. Only supported for services with protocol https using the default HTTP port 80.'
+            response: '- (Optional, string) Response we expect to be included in the Target response when a Health Check was performed.'
+            retries: '- (Required, int) Number of tries a health check will be performed until a target will be listed as unhealthy.'
+            status_codes: '- (Optional, list[string]) We expect that the target answers with these status codes. If not the target is marked as unhealthy.'
+            sticky_sessions: '- (Optional, bool) Enable sticky sessions'
+            timeout: '- (Required, int) Timeout when a health check try will be canceled if there is no response, in seconds.'
+            tls: '- (Optional, bool) Enable TLS certificate checking.'
+        importStatements:
+            - terraform import hcloud_load_balancer_service.example "${LOAD_BALANCER_ID}__${LISTEN_PORT}"
+    hcloud_load_balancer_target:
+        subCategory: ""
+        description: Adds a target to a Hetzner Cloud Load Balancer.
+        name: hcloud_load_balancer_target
+        title: hcloud_load_balancer_target
+        examples:
+            - name: load_balancer_target
+              manifest: |-
+                {
+                  "load_balancer_id": "${hcloud_load_balancer.load_balancer.id}",
+                  "server_id": "${hcloud_server.my_server.id}",
+                  "type": "server"
+                }
+              references:
+                load_balancer_id: hcloud_load_balancer.load_balancer.id
+                server_id: hcloud_server.my_server.id
+              dependencies:
+                hcloud_load_balancer.load_balancer: |-
+                    {
+                      "load_balancer_type": "lb11",
+                      "location": "nbg1",
+                      "name": "my-load-balancer"
+                    }
+                hcloud_server.my_server: |-
+                    {
+                      "image": "ubuntu-24.04",
+                      "name": "my-server",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            ip: |-
+                - (Optional, string) IP address for an IP Target. Required if
+                type is ip.
+            label_selector: |-
+                - (Optional, string) Label Selector selecting targets
+                for this Load Balancer. Required if type is label_selector.
+            load_balancer_id: |-
+                - (Required, int) ID of the Load Balancer to which
+                the target gets attached.
+            server: ': server id, for example: 123'
+            server_id: |-
+                - (Optional, int) ID of the server which should be a
+                target for this Load Balancer. Required if type is server
+            type: |-
+                - (Required, string) Type of the target. Possible values
+                server, label_selector, ip.
+            use_private_ip: |-
+                - (Optional, bool) use the private IP to connect to
+                Load Balancer targets. Only allowed if type is server or
+                label_selector.
+        importStatements:
+            - |-
+              terraform import hcloud_load_balancer_target.server "${LOAD_BALANCER_ID}__server__${SERVER_ID}"
+              terraform import hcloud_load_balancer_target.label "${LOAD_BALANCER_ID}__label_selector__${LABEL_SELECTOR}"
+              terraform import hcloud_load_balancer_target.ip "${LOAD_BALANCER_ID}__ip__${IP}"
+    hcloud_managed_certificate:
+        subCategory: ""
+        description: Obtain a TLS Certificate managed by Hetzner Cloud.
+        name: hcloud_managed_certificate
+        title: hcloud_managed_certificate
+        examples:
+            - name: managed_cert
+              manifest: |-
+                {
+                  "domain_names": [
+                    "*.example.com",
+                    "example.com"
+                  ],
+                  "labels": {
+                    "label_1": "value_1",
+                    "label_2": "value_2"
+                  },
+                  "name": "managed_cert"
+                }
+        argumentDocs:
+            certificate: '- (string) PEM encoded TLS certificate.'
+            created: '- (string) Point in time when the Certificate was created at Hetzner Cloud (in ISO-8601 format).'
+            domain_names: |-
+                - (Required, list) Domain names for which a certificate
+                should be obtained.
+            fingerprint: '- (string) Fingerprint of the certificate.'
+            id: '- (int) Unique ID of the certificate.'
+            labels: |-
+                - (Optional, map) User-defined labels (key-value pairs) the
+                certificate should be created with.
+            name: '- (Required, string) Name of the Certificate.'
+            not_valid_after: '- (string) Point in time when the Certificate stops being valid (in ISO-8601 format).'
+            not_valid_before: '- (string) Point in time when the Certificate becomes valid (in ISO-8601 format).'
+        importStatements:
+            - terraform import hcloud_managed_certificate.example "$CERTIFICATE_ID"
+    hcloud_network:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Network to represent a Network in the Hetzner Cloud.
+        name: hcloud_network
+        title: hcloud_network
+        examples:
+            - name: privNet
+              manifest: |-
+                {
+                  "ip_range": "10.0.1.0/24",
+                  "name": "my-net"
+                }
+        argumentDocs:
+            delete_protection: '- (Optional, bool) Enable or disable delete protection. See "Delete Protection" in the Provider Docs for details.'
+            expose_routes_to_vswitch: '- (Optional, bool) Enable or disable exposing the routes to the vSwitch connection. The exposing only takes effect if a vSwitch connection is active.'
+            id: '- (int) Unique ID of the network.'
+            ip_range: '- (Required, string) IP Range of the whole Network which must span all included subnets and route destinations. Must be one of the private ipv4 ranges of RFC1918.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            name: '- (Required, string) Name of the Network to create (must be unique per project).'
+        importStatements:
+            - terraform import hcloud_network.example "$NETWORK_ID"
+    hcloud_network_route:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Network Route to represent a Network route in the Hetzner Cloud.
+        name: hcloud_network_route
+        title: hcloud_network_route
+        examples:
+            - name: privNet
+              manifest: |-
+                {
+                  "destination": "10.100.1.0/24",
+                  "gateway": "10.0.1.1",
+                  "network_id": "${hcloud_network.mynet.id}"
+                }
+              references:
+                network_id: hcloud_network.mynet.id
+              dependencies:
+                hcloud_network.mynet: |-
+                    {
+                      "ip_range": "10.0.0.0/8",
+                      "name": "my-net"
+                    }
+        argumentDocs:
+            destination: '- (Required, string) Destination network or host of this route. Must be a subnet of the ip_range of the Network. Must not overlap with an existing ip_range in any subnets or with any destinations in other routes or with the first ip of the networks ip_range or with 172.31.1.1.'
+            gateway: '- (Required, string) Gateway for the route. Cannot be the first ip of the networks ip_range and also cannot be 172.31.1.1 as this IP is being used as a gateway for the public network interface of servers.'
+            id: '- (int) Unique ID of the Network route.'
+            network_id: '- (Required, int) ID of the Network the route should be added to.'
+        importStatements:
+            - terraform import hcloud_network_route.example "$NETWORK_ID-$DESTINATION"
+    hcloud_network_subnet:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Network Subnet to represent a Subnet in the Hetzner Cloud.
+        name: hcloud_network_subnet
+        title: hcloud_network_subnet
+        examples:
+            - name: foonet
+              manifest: |-
+                {
+                  "ip_range": "10.0.1.0/24",
+                  "network_id": "${hcloud_network.mynet.id}",
+                  "network_zone": "eu-central",
+                  "type": "cloud"
+                }
+              references:
+                network_id: hcloud_network.mynet.id
+              dependencies:
+                hcloud_network.mynet: |-
+                    {
+                      "ip_range": "10.0.0.0/8",
+                      "name": "my-net"
+                    }
+        argumentDocs:
+            id: '- (string) ID of the Network subnet.'
+            ip_range: '- (Required, string) Range to allocate IPs from. Must be a subnet of the ip_range of the Network and must not overlap with any other subnets or with any destinations in routes.'
+            network_id: '- (Required, int) ID of the Network the subnet should be added to.'
+            network_zone: '- (Required, string) Name of network zone.'
+            type: '- (Required, string) Type of subnet. server, cloud or vswitch'
+            vswitch_id: '- (Optional, int) ID of the vswitch, Required if type is vswitch'
+        importStatements:
+            - terraform import hcloud_network_subnet.example "$NETWORK_ID-$IP_RANGE"
+    hcloud_placement_group:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Placement Group to represent a Placement Group in the Hetzner Cloud.
+        name: hcloud_placement_group
+        title: hcloud_placement_group
+        examples:
+            - name: my-placement-group
+              manifest: |-
+                {
+                  "labels": {
+                    "key": "value"
+                  },
+                  "name": "my-placement-group",
+                  "type": "spread"
+                }
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "placement_group_id": "${hcloud_placement_group.my-placement-group.id}",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            id: '- (int) Unique ID of the Placement Group.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            name: '- (Optional, string) Name of the Placement Group.'
+            type: '- (Required, string) Type of the Placement Group.'
+        importStatements:
+            - terraform import hcloud_placement_group.example "$PLACEMENT_GROUP_ID"
+    hcloud_primary_ip:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Primary IP to represent a publicly-accessible static IP address that can be mapped to one of your servers.
+        name: hcloud_primary_ip
+        title: hcloud_primary_ip
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "assignee_type": "server",
+                  "auto_delete": true,
+                  "datacenter": "fsn1-dc14",
+                  "labels": {
+                    "hallo": "welt"
+                  },
+                  "name": "primary_ip_test",
+                  "type": "ipv4"
+                }
+              dependencies:
+                hcloud_server.server_test: |-
+                    {
+                      "datacenter": "fsn1-dc14",
+                      "image": "ubuntu-24.04",
+                      "labels": {
+                        "test": "tessst1"
+                      },
+                      "name": "test-server",
+                      "public_net": [
+                        {
+                          "ipv4": "${hcloud_primary_ip.main.id}"
+                        }
+                      ],
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            assignee_id: '- (int, optional) ID of the assigned resource.'
+            assignee_type: '- (string) The type of the assigned resource. Currently supported: server'
+            auto_delete: |-
+                - (bool) Whether auto delete is enabled.
+                Important note:It is recommended to set auto_delete to false, because if a server assigned to the managed ip is getting deleted, it will also delete the primary IP which will break the TF state.
+            datacenter: '- (string, optional, deprecated) The datacenter name to create the resource in. See the Hetzner Docs for more details about datacenters.'
+            delete_protection: '- (bool, optional) Whether delete protection is enabled. See "Delete Protection" in the Provider Docs for details.'
+            id: '- (int) Unique ID of the Primary IP.'
+            ip_address: '- (string) IP Address of the Primary IP.'
+            ip_network: '- (string) IPv6 subnet of the Primary IP for IPv6 addresses. (Only set if type is ipv6)'
+            labels: '- (map, optional) User-defined labels (key-value pairs).'
+            location: '- (string, optional) The location name to create the resource in. See the Hetzner Docs for more details about locations.'
+            name: '- (string) Name of the Primary IP.'
+            type: '- (string) Type of the Primary IP. ipv4 or ipv6'
+        importStatements:
+            - terraform import hcloud_primary_ip.example "$PRIMARY_IP_ID"
+    hcloud_rdns:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Reverse DNS Entry to create, modify and reset reverse dns entries for Hetzner Cloud Servers, Primary IPs, Floating IPs or Load Balancers.
+        name: hcloud_rdns
+        title: hcloud_rdns
+        examples:
+            - name: master
+              manifest: |-
+                {
+                  "dns_ptr": "example.com",
+                  "ip_address": "${hcloud_server.node1.ipv4_address}",
+                  "server_id": "${hcloud_server.node1.id}"
+                }
+              references:
+                ip_address: hcloud_server.node1.ipv4_address
+                server_id: hcloud_server.node1.id
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+            - name: primary1
+              manifest: |-
+                {
+                  "dns_ptr": "example.com",
+                  "ip_address": "${hcloud_primary_ip.primary1.ip_address}",
+                  "primary_ip_id": "${hcloud_primary_ip.primary1.id}"
+                }
+              references:
+                ip_address: hcloud_primary_ip.primary1.ip_address
+                primary_ip_id: hcloud_primary_ip.primary1.id
+              dependencies:
+                hcloud_primary_ip.primary1: |-
+                    {
+                      "datacenter": "nbg1-dc3",
+                      "type": "ipv4"
+                    }
+            - name: floating_master
+              manifest: |-
+                {
+                  "dns_ptr": "example.com",
+                  "floating_ip_id": "${hcloud_floating_ip.floating1.id}",
+                  "ip_address": "${hcloud_floating_ip.floating1.ip_address}"
+                }
+              dependencies:
+                hcloud_floating_ip.floating1: |-
+                    {
+                      "home_location": "nbg1",
+                      "type": "ipv4"
+                    }
+            - name: load_balancer_master
+              manifest: |-
+                {
+                  "dns_ptr": "example.com",
+                  "ip_address": "${hcloud_load_balancer.load_balancer1.ipv4}",
+                  "load_balancer_id": "${hcloud_load_balancer.load_balancer1.id}"
+                }
+              dependencies:
+                hcloud_load_balancer.load_balancer1: |-
+                    {
+                      "load_balancer_type": "lb11",
+                      "location": "fsn1",
+                      "name": "load_balancer1"
+                    }
+        argumentDocs:
+            dns_ptr: '- (Required, string) The DNS address the ip_address should resolve to.'
+            floating_ip_id: '- (Required, int) The Floating IP the ip_address belongs to.'
+            id: '- (int) Unique ID of the Reverse DNS Entry.'
+            ip_address: '- (Required, string) The IP address that should point to dns_ptr.'
+            load_balancer_id: '- (Required, int) The Load Balancer the ip_address belongs to.'
+            primary_ip_id: '- (Required, int) The Primary IP the ip_address belongs to.'
+            server_id: '- (Required, int) The server the ip_address belongs to.'
+        importStatements:
+            - |-
+              terraform import hcloud_rdns.example "$PREFIX-$ID-$IP"
+
+              # import reverse dns entry on server with id 123, ip 192.168.100.1
+              terraform import hcloud_rdns.myrdns s-123-192.168.100.1
+
+              # import reverse dns entry on primary ip with id 123, ip 2001:db8::1
+              terraform import hcloud_rdns.myrdns p-123-2001:db8::1
+
+              # import reverse dns entry on floating ip with id 123, ip 2001:db8::1
+              terraform import hcloud_rdns.myrdns f-123-2001:db8::1
+
+              # import reverse dns entry on load balancer with id 123, ip 2001:db8::1
+              terraform import hcloud_rdns.myrdns l-123-2001:db8::1
+    hcloud_server:
+        subCategory: ""
+        description: Provides an Hetzner Cloud server resource. This can be used to create, modify, and delete servers. Servers also support provisioning.
+        name: hcloud_server
+        title: hcloud_server
+        examples:
+            - name: node1
+              manifest: |-
+                {
+                  "image": "debian-12",
+                  "name": "node1",
+                  "public_net": [
+                    {
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": true
+                    }
+                  ],
+                  "server_type": "cx23"
+                }
+            - name: server_test
+              manifest: |-
+                {
+                  "image": "ubuntu-24.04",
+                  "labels": {
+                    "test": "tessst1"
+                  },
+                  "location": "hel1",
+                  "name": "test-server",
+                  "public_net": [
+                    {
+                      "ipv4": "${hcloud_primary_ip.primary_ip_1.id}",
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": false
+                    }
+                  ],
+                  "server_type": "cx23"
+                }
+              references:
+                public_net.ipv4: hcloud_primary_ip.primary_ip_1.id
+              dependencies:
+                hcloud_primary_ip.primary_ip_1: |-
+                    {
+                      "assignee_type": "server",
+                      "auto_delete": true,
+                      "labels": {
+                        "hallo": "welt"
+                      },
+                      "location": "hel1",
+                      "name": "primary_ip_test",
+                      "type": "ipv4"
+                    }
+            - name: server
+              manifest: |-
+                {
+                  "depends_on": [
+                    "${hcloud_network_subnet.network-subnet}"
+                  ],
+                  "image": "ubuntu-24.04",
+                  "location": "nbg1",
+                  "name": "server",
+                  "network": [
+                    {
+                      "alias_ips": [
+                        "10.0.1.6",
+                        "10.0.1.7"
+                      ],
+                      "ip": "10.0.1.5",
+                      "network_id": "${hcloud_network.network.id}"
+                    }
+                  ],
+                  "server_type": "cx23"
+                }
+              references:
+                network.network_id: hcloud_network.network.id
+              dependencies:
+                hcloud_network.network: |-
+                    {
+                      "ip_range": "10.0.0.0/16",
+                      "name": "network"
+                    }
+                hcloud_network_subnet.network-subnet: |-
+                    {
+                      "ip_range": "10.0.1.0/24",
+                      "network_id": "${hcloud_network.network.id}",
+                      "network_zone": "eu-central",
+                      "type": "cloud"
+                    }
+            - name: from_snapshot
+              manifest: |-
+                {
+                  "image": "${data.hcloud_image.packer_snapshot.id}",
+                  "name": "from-snapshot",
+                  "public_net": [
+                    {
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": true
+                    }
+                  ],
+                  "server_type": "cx23"
+                }
+              references:
+                image: data.hcloud_image.packer_snapshot.id
+            - name: server_test
+              manifest: |-
+                {
+                  "public_net": [
+                    {
+                      "ipv4": "${hcloud_primary_ip.primary_ip_1.id}",
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": false
+                    }
+                  ]
+                }
+              references:
+                public_net.ipv4: hcloud_primary_ip.primary_ip_1.id
+            - name: server_test
+              manifest: |-
+                {
+                  "public_net": [
+                    {
+                      "ipv4": "${hcloud_primary_ip.primary_ip_1.id}",
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": true
+                    }
+                  ]
+                }
+              references:
+                public_net.ipv4: hcloud_primary_ip.primary_ip_1.id
+            - name: server_test
+              manifest: |-
+                {
+                  "public_net": [
+                    {
+                      "ipv4_enabled": true,
+                      "ipv6_enabled": true
+                    }
+                  ]
+                }
+        argumentDocs:
+            alias_ips: '- (Optional, list) Alias IPs the server should have in the Network.'
+            allow_deprecated_images: '- (Optional, bool) Enable the use of deprecated images (default: false). Note Deprecated images will be removed after three months. Using them is then no longer possible.'
+            backup_window: '- (string) The backup window of the server, if enabled.'
+            backups: '- (Optional, bool) Enable or disable backups.'
+            datacenter: '- (Optional, string, deprecated) The datacenter name to create the server in. See the Hetzner Docs for more details about datacenters.'
+            delete_protection: '- (Optional, bool) Enable or disable delete protection (Needs to be the same as rebuild_protection). See "Delete Protection" in the Provider Docs for details.'
+            firewall_ids: '- (Optional, list) Firewall IDs the server should be attached to on creation.'
+            id: '- (int) Unique ID of the server.'
+            ignore_remote_firewall_ids: |-
+                - (Optional, bool) Ignores any updates
+                to the firewall_ids argument which were received from the server.
+                This should not be used in normal cases. See the documentation of the
+                hcloud_firewall_attachment resource for a reason to use this
+                argument.
+            image: '- (Required, string) Name or ID of the image the server is created from. Note the image property is only required when using the resource to create servers. As the Hetzner Cloud API may return servers without an image ID set it is not marked as required in the Terraform Provider itself. Thus, users will get an error from the underlying client library if they forget to set the property and try to create a server.'
+            ip: '- (Optional, string) Specify the IP the server should get in the network'
+            ipv4_address: '- (string) The IPv4 address.'
+            ipv6_address: '- (string) The first IPv6 address of the assigned network.'
+            ipv6_network: '- (string) The IPv6 network.'
+            iso: '- (Optional, string) ID or Name of an ISO image to mount.'
+            keep_disk: '- (Optional, bool) If true, do not upgrade the disk. This allows downgrading the server type later.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            location: '- (Optional, string) The location name to create the server in. See the Hetzner Docs for more details about locations.'
+            mac_address: '- (Optional, string) The MAC address the private interface of the server has'
+            name: '- (Required, string) Name of the server to create (must be unique per project and a valid hostname as per RFC 1123).'
+            network: '- (Optional) Network the server should be attached to on creation. (Can be specified multiple times)'
+            network_id: '- (Required, int) ID of the network'
+            placement_group_id: '- (Optional, string) Placement Group ID the server added to on creation.'
+            primary_disk_size: '- (int) The size of the primary disk in GB.'
+            public_net: |-
+                - (Optional, block) In this block you can either enable / disable ipv4 and ipv6 or link existing primary IPs (checkout the examples).
+                If this block is not defined, two primary (ipv4 & ipv6) ips getting auto generated.
+            rebuild_protection: '- (Optional, bool) Enable or disable rebuild protection (Needs to be the same as delete_protection).'
+            rescue: '- (Optional, string) Enable and boot in to the specified rescue system. This enables simple installation of custom operating systems. linux64 or linux32'
+            server_type: '- (Required, string) Name of the server type this server should be created with.'
+            shutdown_before_deletion: '- (bool) Whether to try shutting the server down gracefully before deleting it.'
+            ssh_keys: '- (Optional, list) SSH key IDs or names which should be injected into the server at creation time. Once the server is created, you can not update the list of SSH Keys. If you do change this, you will be prompted to destroy and recreate the server. You can avoid this by setting lifecycle.ignore_changes to [ ssh_keys ].'
+            status: '- (string) The status of the server.'
+            user_data: '- (Optional, string) Cloud-Init user data to use during server creation'
+        importStatements:
+            - terraform import hcloud_server.example "$SERVER_ID"
+    hcloud_server_network:
+        subCategory: ""
+        description: Manage the attachment of a Server in a Network in the Hetzner Cloud.
+        name: hcloud_server_network
+        title: hcloud_server_network Resource - hcloud
+        examples:
+            - name: node1_subnet1
+              manifest: |-
+                {
+                  "alias_ips": [
+                    "10.0.1.10"
+                  ],
+                  "ip": "10.0.1.5",
+                  "server_id": "${hcloud_server.node1.id}",
+                  "subnet_id": "${hcloud_network_subnet.subnet1.id}"
+                }
+              references:
+                server_id: hcloud_server.node1.id
+                subnet_id: hcloud_network_subnet.subnet1.id
+              dependencies:
+                hcloud_network.network: |-
+                    {
+                      "ip_range": "10.0.0.0/16",
+                      "name": "network"
+                    }
+                hcloud_network_subnet.subnet1: |-
+                    {
+                      "ip_range": "10.0.1.0/24",
+                      "network_id": "${hcloud_network.network.id}",
+                      "network_zone": "eu-central",
+                      "type": "cloud"
+                    }
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            alias_ips: (Set of String) Additional IPs to assign to the Server.
+            id: (String) The ID of this resource.
+            ip: (String) IP to assign to the Server.
+            mac_address: (String) MAC address of the Server on the Network.
+            network_id: (Number) ID of the Network to attach the Server to. Using subnet_id is preferred. Required if subnet_id is not set. If subnet_id or ip are not set, the Server will be attached to the last subnet (ordered by ip_range).
+            server_id: (Number) ID of the Server.
+            subnet_id: (String) ID of the Subnet to attach the Server to. Required if network_id is not set.
+        importStatements:
+            - terraform import hcloud_server_network.example "$SERVER_ID-$NETWORK_ID"
+    hcloud_snapshot:
+        subCategory: ""
+        description: Provides a Hetzner Cloud snapshot to represent an image with type snapshot in the Hetzner Cloud.
+        name: hcloud_snapshot
+        title: hcloud_snapshot
+        examples:
+            - name: my-snapshot
+              manifest: |-
+                {
+                  "server_id": "${hcloud_server.node1.id}"
+                }
+              references:
+                server_id: hcloud_server.node1.id
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            description: '- (Optional, string) Description of the snapshot.'
+            id: '- (int) Unique ID of the snapshot.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs) should be created with.'
+            server_id: '- (Required, int) Server to the snapshot should be created from.'
+        importStatements:
+            - terraform import hcloud_snapshot.example "$IMAGE_ID"
+    hcloud_ssh_key:
+        subCategory: ""
+        description: Provides a Hetzner Cloud SSH Key resource to manage SSH Keys for server access.
+        name: hcloud_ssh_key
+        title: hcloud_ssh_key Resource - hcloud
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "name": "my-ssh-key",
+                  "public_key": "${file(\"~/.ssh/id_ed25519.pub\")}"
+                }
+        argumentDocs:
+            fingerprint: (String) Fingerprint of the SSH public key.
+            id: (String) ID of the SSH Key.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            name: (String) Name of the SSH Key.
+            public_key: (String) Public key of the SSH Key pair. If this is a file, it can be read using the file interpolation function.
+        importStatements:
+            - terraform import hcloud_ssh_key.example "$SSH_KEY_ID"
+    hcloud_storage_box:
+        subCategory: ""
+        description: 'Provides a Hetzner Storage Box resource. See the Storage Box API documentation https://docs.hetzner.cloud/reference/hetzner#storage-boxes for more details. Experimental: Storage Box support is experimental, breaking changes may occur within minor releases. See https://github.com/hetznercloud/terraform-provider-hcloud/issues/1285 for more details.'
+        name: hcloud_storage_box
+        title: hcloud_storage_box Resource - hcloud
+        examples:
+            - name: backups
+              manifest: |-
+                {
+                  "access_settings": {
+                    "reachable_externally": true,
+                    "samba_enabled": true,
+                    "ssh_enabled": true,
+                    "webdav_enabled": true,
+                    "zfs_enabled": true
+                  },
+                  "delete_protection": true,
+                  "labels": {
+                    "foo": "bar"
+                  },
+                  "location": "hel1",
+                  "name": "backups",
+                  "password": "${var.storage_box_password}",
+                  "snapshot_plan": {
+                    "day_of_week": 3,
+                    "hour": 18,
+                    "max_snapshots": 10,
+                    "minute": 16
+                  },
+                  "storage_box_type": "bx21"
+                }
+              references:
+                password: var.storage_box_password
+            - name: ssh_key
+              manifest: |-
+                {
+                  "lifecycle": [
+                    {
+                      "ignore_changes": [
+                        "${ssh_keys}"
+                      ],
+                      "prevent_destroy": true
+                    }
+                  ],
+                  "location": "hel1",
+                  "name": "backups",
+                  "password": "${var.storage_box_password}",
+                  "ssh_keys": [
+                    "${hcloud_ssh_key.my_key.public_key}",
+                    "${file(\"~/.ssh/id_ed25519.pub\")}"
+                  ],
+                  "storage_box_type": "bx21"
+                }
+              references:
+                lifecycle.ignore_changes: ssh_keys
+                password: var.storage_box_password
+                ssh_keys: hcloud_ssh_key.my_key.public_key
+        argumentDocs:
+            access_settings: (Attributes) Access settings of the Storage Box. (see below for nested schema)
+            day_of_month: (Number) Day of the month when the Snapshot Plan is executed. Null means every day.
+            day_of_week: (Number) Day of the week when the Snapshot Plan is executed. Starts at 0 for Sunday til 6 for Saturday. Note that this differs from the API, which uses 1 (Monday) through 7 (Sunday). Null means every day.
+            delete_protection: (Boolean) Prevent the Storage Box from being accidentally deleted outside of Terraform.
+            hour: (Number) Hour when the Snapshot Plan is executed (UTC).
+            id: (Number) ID of the Storage Box.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            location: (String) Name of the Location.
+            max_snapshots: (Number) Maximum amount of Snapshots that will be created by this Snapshot Plan. Older Snapshots will be deleted.
+            minute: (Number) Minute when the Snapshot Plan is executed (UTC).
+            name: (String) Name of the Storage Box.
+            password: (String, Sensitive) Password of the Storage Box. For more details, see the Storage Boxes password policy.
+            reachable_externally: (Boolean) Whether access from outside the Hetzner network is allowed.
+            samba_enabled: (Boolean) Whether the Samba subsystem is enabled.
+            server: (String) FQDN of the Storage Box.
+            snapshot_plan: (Attributes) Details of the active snapshot plan. (see below for nested schema)
+            ssh_enabled: (Boolean) Whether the SSH subsystem is enabled.
+            ssh_keys: (Set of String) SSH public keys in OpenSSH format to inject into the Storage Box. It is not possible to update the SSH Keys through the API, so changing this attribute forces a replace of the Storage Box.
+            storage_box_type: (String) Name of the Storage Box Type.
+            system: (String) Host system of the Storage Box.
+            username: (String) Primary username of the Storage Box.
+            webdav_enabled: (Boolean) Whether the WebDAV subsystem is enabled.
+            zfs_enabled: (Boolean) Whether the ZFS snapshot folder is visible.
+        importStatements:
+            - terraform import hcloud_storage_box.example "$STORAGE_BOX_ID"
+    hcloud_storage_box_snapshot:
+        subCategory: ""
+        description: 'Provides a Hetzner Storage Box Snapshot resource. See the Storage Box Snapshots API documentation https://docs.hetzner.cloud/reference/hetzner#storage-box-snapshots for more details. Experimental: Storage Box support is experimental, breaking changes may occur within minor releases. See https://github.com/hetznercloud/terraform-provider-hcloud/issues/1285 for more details.'
+        name: hcloud_storage_box_snapshot
+        title: hcloud_storage_box_snapshot Resource - hcloud
+        examples:
+            - name: backup
+              manifest: |-
+                {
+                  "description": "Before Tool XYZ Migration",
+                  "labels": {
+                    "env": "production"
+                  },
+                  "storage_box_id": "${hcloud_storage_box.main.id}"
+                }
+              references:
+                storage_box_id: hcloud_storage_box.main.id
+              dependencies:
+                hcloud_storage_box.main: '{}'
+        argumentDocs:
+            description: (String) Description of the Storage Box Snapshot.
+            id: (Number) ID of the Storage Box Snapshot.
+            is_automatic: (Boolean) Whether the Storage Box Snapshot was created automatically.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            name: (String) Name of the Storage Box Snapshot.
+            storage_box_id: (Number) ID of the Storage Box.
+        importStatements:
+            - terraform import hcloud_storage_box_snapshot.example "$STORAGE_BOX_ID/$STORAGE_BOX_SNAPSHOT_ID"
+    hcloud_storage_box_subaccount:
+        subCategory: ""
+        description: 'Provides a Hetzner Storage Box Subaccount resource. See the Storage Box Subaccounts API documentation https://docs.hetzner.cloud/reference/hetzner#storage-box-subaccounts for more details. Experimental: Storage Box support is experimental, breaking changes may occur within minor releases. See https://github.com/hetznercloud/terraform-provider-hcloud/issues/1285 for more details.'
+        name: hcloud_storage_box_subaccount
+        title: hcloud_storage_box_subaccount Resource - hcloud
+        examples:
+            - name: team_badger
+              manifest: |-
+                {
+                  "access_settings": {
+                    "reachable_externally": true,
+                    "samba_enabled": true
+                  },
+                  "description": "Primary account for the Badger team to upload files.",
+                  "home_directory": "teams/badger/",
+                  "labels": {
+                    "env": "production",
+                    "team": "badger"
+                  },
+                  "name": "badger",
+                  "password": "${var.team_badger_password}",
+                  "storage_box_id": "${hcloud_storage_box.main.id}"
+                }
+              references:
+                password: var.team_badger_password
+                storage_box_id: hcloud_storage_box.main.id
+              dependencies:
+                hcloud_storage_box.main: '{}'
+        argumentDocs:
+            access_settings: (Attributes) Access settings for the Subaccount. (see below for nested schema)
+            description: (String) A description of the Storage Box Subaccount.
+            home_directory: (String) Home directory of the Storage Box Subaccount. The directory will be created if it doesn't exist yet.
+            id: (Number) ID of the Storage Box Subaccount.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            name: (String) Name of the Storage Box Subaccount.
+            password: (String, Sensitive) Password of the Storage Box. For more details, see the Storage Boxes password policy.
+            reachable_externally: (Boolean) Whether access from outside the Hetzner network is allowed.
+            readonly: (Boolean) Whether the Subaccount is read-only.
+            samba_enabled: (Boolean) Whether the Samba subsystem is enabled.
+            server: (String) FQDN of the Storage Box Subaccount.
+            ssh_enabled: (Boolean) Whether the SSH subsystem is enabled.
+            storage_box_id: (Number) ID of the Storage Box.
+            username: (String) Username of the Storage Box Subaccount.
+            webdav_enabled: (Boolean) Whether the WebDAV subsystem is enabled.
+        importStatements:
+            - terraform import hcloud_storage_box_subaccount.example "$STORAGE_BOX_ID/$STORAGE_BOX_SUBACCOUNT_ID"
+    hcloud_uploaded_certificate:
+        subCategory: ""
+        description: Upload a TLS certificate to Hetzner Cloud.
+        name: hcloud_uploaded_certificate
+        title: hcloud_uploaded_certificate
+        examples:
+            - name: sample_certificate
+              manifest: |-
+                {
+                  "certificate": "-----BEGIN CERTIFICATE-----\nMIIDMDCCAhigAwIBAgIIJgROscP8RRUwDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UE\n...\nTKS8gQ==\n-----END CERTIFICATE-----\n",
+                  "labels": {
+                    "label_1": "value_1",
+                    "label_2": "value_2"
+                  },
+                  "name": "test-certificate-%d",
+                  "private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEAorPccsHibgGLJIub5Sb1yvDvARifoKzg7MIhyAYLnJkGn9B1\n...\nAHcjLFCNvobInLHTTmCoAxYBmEv2eakas0+n4g/LM2Ukaw1Bz+3VrVo=\n-----END RSA PRIVATE KEY-----\n"
+                }
+        argumentDocs:
+            certificate: '- (Required, string) PEM encoded TLS certificate.'
+            created: '- (string) Point in time when the Certificate was created at Hetzner Cloud (in ISO-8601 format).'
+            domain_names: '- (list) Domains and subdomains covered by the certificate.'
+            fingerprint: '- (string) Fingerprint of the certificate.'
+            id: '- (int) Unique ID of the certificate.'
+            labels: |-
+                - (Optional, map) User-defined labels (key-value pairs) the
+                certificate should be created with.
+            name: '- (Required, string) Name of the Certificate.'
+            not_valid_after: '- (string) Point in time when the Certificate stops being valid (in ISO-8601 format).'
+            not_valid_before: '- (string) Point in time when the Certificate becomes valid (in ISO-8601 format).'
+            private_key: '- (Required, string) PEM encoded private key belonging to the certificate.'
+        importStatements:
+            - terraform import hcloud_uploaded_certificate.example "$CERTIFICATE_ID"
+    hcloud_volume:
+        subCategory: ""
+        description: Provides a Hetzner Cloud volume resource to manage volumes.
+        name: hcloud_volume
+        title: hcloud_volume
+        examples:
+            - name: master
+              manifest: |-
+                {
+                  "automount": true,
+                  "format": "ext4",
+                  "name": "volume1",
+                  "server_id": "${hcloud_server.node1.id}",
+                  "size": 50
+                }
+              references:
+                server_id: hcloud_server.node1.id
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+        argumentDocs:
+            automount: '- (Optional, bool) Automount the volume upon attaching it (server_id must be provided).'
+            delete_protection: '- (Optional, bool) Enable or disable delete protection. See "Delete Protection" in the Provider Docs for details.'
+            format: '- (Optional, string) Format volume after creation. xfs or ext4'
+            id: '- (int) Unique ID of the volume.'
+            labels: '- (Optional, map) User-defined labels (key-value pairs).'
+            linux_device: '- (string) Device path on the file system for the Volume.'
+            location: '- (Optional, string) The location name of the volume to create, not allowed if server_id argument is passed. See the Hetzner Docs for more details about locations.'
+            name: '- (Required, string) Name of the volume to create (must be unique per project).'
+            server_id: '- (Optional, int) Server to attach the Volume to, not allowed if location argument is passed.'
+            size: '- (Required, int) Size of the volume (in GB).'
+        importStatements:
+            - terraform import hcloud_volume.example "$VOLUME_ID"
+    hcloud_volume_attachment:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Volume attachment to attach a Volume to a Hetzner Cloud Server.
+        name: hcloud_volume_attachment
+        title: hcloud_volume_attachment
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "automount": true,
+                  "server_id": "${hcloud_server.node1.id}",
+                  "volume_id": "${hcloud_volume.master.id}"
+                }
+              references:
+                server_id: hcloud_server.node1.id
+                volume_id: hcloud_volume.master.id
+              dependencies:
+                hcloud_server.node1: |-
+                    {
+                      "datacenter": "nbg1-dc3",
+                      "image": "debian-12",
+                      "name": "node1",
+                      "server_type": "cx23"
+                    }
+                hcloud_volume.master: |-
+                    {
+                      "location": "nbg1",
+                      "size": 10
+                    }
+        argumentDocs:
+            automount: '- (Optional, bool) Automount the volume upon attaching it.'
+            id: '- (int) Unique ID of the Volume Attachment.'
+            server_id: '- (Required, int) Server to attach the Volume to.'
+            volume_id: '- (Required, int) ID of the Volume.'
+        importStatements:
+            - terraform import hcloud_volume_attachment.example "$VOLUME_ID"
+    hcloud_zone:
+        subCategory: ""
+        description: Provides a Hetzner Cloud Zone resource. This can be used to create, modify, and delete Zones. For Internationalized domain names (IDN), see the provider::hcloud::idna function. See the Zones API documentation https://docs.hetzner.cloud/reference/cloud#zones for more details.
+        name: hcloud_zone
+        title: hcloud_zone Resource - hcloud
+        examples:
+            - name: example_primary
+              manifest: |-
+                {
+                  "delete_protection": false,
+                  "labels": {
+                    "key": "value"
+                  },
+                  "mode": "primary",
+                  "name": "example.com",
+                  "ttl": 10800
+                }
+            - name: example_secondary
+              manifest: |-
+                {
+                  "delete_protection": false,
+                  "labels": {
+                    "key": "value"
+                  },
+                  "mode": "secondary",
+                  "name": "example.com",
+                  "primary_nameservers": [
+                    {
+                      "address": "203.5.113.54"
+                    },
+                    {
+                      "address": "203.5.113.55",
+                      "port": 5353
+                    },
+                    {
+                      "address": "203.5.113.56",
+                      "tsig_alg": "hmac-sha256",
+                      "tsig_key": "205ab4910f35e361cefd99727082d6d08f4597f715164704d6541b3bc33da98f"
+                    }
+                  ],
+                  "ttl": 10800
+                }
+            - name: example_idna
+              manifest: "{\n  \"mode\": \"primary\",\n  \"name\": \"${provider::hcloud::idna(\\\"exämple-\U0001F36A.com\\\")}\"\n}"
+        argumentDocs:
+            address: (String) Public IPv4 or IPv6 address of the primary nameserver.
+            assigned: (List of String) Authoritative Hetzner nameservers assigned to the Zone.
+            authoritative_nameservers: (Attributes) Authoritative nameservers of the Zone. (see below for nested schema)
+            delete_protection: (Boolean) Whether delete protection is enabled.
+            id: (Number) ID of the Zone.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            mode: (String) Mode of the Zone.
+            name: (String) Name of the Zone.
+            port: (Number) Port of the primary nameserver.
+            primary_nameservers: (Attributes List) Primary nameservers of the Zone. Forbidden when mode is primary and required when mode is secondary. (see below for nested schema)
+            registrar: (String) Registrar of the Zone.
+            tsig_algorithm: (String) Transaction signature (TSIG) algorithm used to generate the TSIG key.
+            tsig_key: (String) Transaction signature (TSIG) key
+            ttl: (Number) Default Time To Live (TTL) of the Zone.
+        importStatements:
+            - terraform import hcloud_zone.example "$ZONE_ID_OR_NAME"
+    hcloud_zone_rrset:
+        subCategory: ""
+        description: 'Provides a Hetzner Cloud Zone Resource Record Set (RRSet) resource. This can be used to create, modify, and delete Zone RRSets. See the Zone RRSets API documentation https://docs.hetzner.cloud/reference/cloud#zone-rrsets for more details. RRSets of type TXT: The format of TXT records must consist of one or many quoted strings of 255 characters. A helper function to format TXT record is available at provider::hcloud::txt_record. See the examples for more details. RRSets of type SOA: SOA records are created or deleted by the Hetzner Cloud API when creating or deleting the parent Zone, therefor this Terraform resource will: import the RRSet in the state, instead of creating it.remove the RRSet from the state, instead of deleting it.set the SOA record SERIAL value to 0 before saving it to the state, as this value is automatically incremented by the API and would cause issues otherwise.'
+        name: hcloud_zone_rrset
+        title: hcloud_zone_rrset Resource - hcloud
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "change_protection": false,
+                  "labels": {
+                    "key": "value"
+                  },
+                  "name": "www",
+                  "records": [
+                    {
+                      "comment": "web server 1",
+                      "value": "201.78.10.45"
+                    }
+                  ],
+                  "ttl": 10800,
+                  "type": "A",
+                  "zone": "${hcloud_zone.example.name}"
+                }
+              references:
+                zone: hcloud_zone.example.name
+              dependencies:
+                hcloud_zone.example: |-
+                    {
+                      "mode": "primary",
+                      "name": "example.com"
+                    }
+            - name: example_txt
+              manifest: |-
+                {
+                  "name": "@",
+                  "records": [
+                    {
+                      "value": "${provider::hcloud::txt_record(\"v=spf1 include:_spf.example.net ~all\")}"
+                    },
+                    {
+                      "value": "\"v=spf1 include:_spf.example.net ~all\""
+                    }
+                  ],
+                  "type": "TXT",
+                  "zone": "${hcloud_zone.example.name}"
+                }
+              references:
+                zone: hcloud_zone.example.name
+              dependencies:
+                hcloud_zone.example: |-
+                    {
+                      "mode": "primary",
+                      "name": "example.com"
+                    }
+            - name: example_soa
+              manifest: |-
+                {
+                  "name": "@",
+                  "records": [
+                    {
+                      "value": "hydrogen.ns.hetzner.com. dns.hetzner.com. 0 86400 10800 3600000 3600"
+                    }
+                  ],
+                  "type": "SOA",
+                  "zone": "${hcloud_zone.example.name}"
+                }
+              references:
+                zone: hcloud_zone.example.name
+              dependencies:
+                hcloud_zone.example: |-
+                    {
+                      "mode": "primary",
+                      "name": "example.com"
+                    }
+        argumentDocs:
+            change_protection: (Boolean) Whether change protection is enabled.
+            comment: (String) Comment of the record.
+            id: (String) ID of the Zone RRSet.
+            labels: (Map of String) User-defined labels (key-value pairs) for the resource.
+            name: (String) Name of the Zone RRSet.
+            records: (Attributes Set) Records of the Zone RRSet. (see below for nested schema)
+            ttl: (Number) Time To Live (TTL) of the Zone RRSet.
+            type: (String) Type of the Zone RRSet.
+            value: (String) Value of the record.
+            zone: (String) ID or Name of the parent Zone.
+        importStatements:
+            - |-
+              terraform import hcloud_zone_rrset.example "$ZONE_ID_OR_NAME/$RRSET_NAME/$RRSET_TYPE"
+              terraform import hcloud_zone_rrset.example "$ZONE_ID_OR_NAME/$RRSET_ID"

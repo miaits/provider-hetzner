@@ -1,0 +1,12 @@
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  name: example-server
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    name: example-server
+    serverType: cx23
+    image: ubuntu-22.04
+    location: hel1
