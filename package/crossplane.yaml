@@ -1,0 +1,7 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: upjet-provider-template
+spec:
+  capabilities:
+    - SafeStart
