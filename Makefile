@@ -10,12 +10,12 @@ export TERRAFORM_VERSION ?= 1.5.7
 # licensed under BSL, which is not permitted.
 TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAFORM_VERSION)\n1.6" | sort -V | head -n1`" ] && echo 1 || echo 0)
 
-export TERRAFORM_PROVIDER_SOURCE ?= hashicorp/null
-export TERRAFORM_PROVIDER_REPO ?= https://github.com/hashicorp/terraform-provider-null
-export TERRAFORM_PROVIDER_VERSION ?= 3.2.4
-export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-null
+export TERRAFORM_PROVIDER_SOURCE ?= hetznercloud/hcloud
+export TERRAFORM_PROVIDER_REPO ?= https://github.com/hetznercloud/terraform-provider-hcloud
+export TERRAFORM_PROVIDER_VERSION ?= 1.59.0
+export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-hcloud
 export TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX ?= https://releases.hashicorp.com/$(TERRAFORM_PROVIDER_DOWNLOAD_NAME)/$(TERRAFORM_PROVIDER_VERSION)
-export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-null_v3.2.4_x5
+export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-hcloud_v1.59.0
 export TERRAFORM_DOCS_PATH ?= docs/resources
 
 
