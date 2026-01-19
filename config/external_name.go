@@ -9,6 +9,7 @@ import (
 var ExternalNameConfigs = map[string]config.ExternalName{
 	// Import requires using a randomly generated ID from provider: nl-2e21sda
 	"null_resource": idWithStub(),
+	"hcloud_network": config.IdentifierFromProvider,
 	"hcloud_server": config.IdentifierFromProvider,
 }
 
