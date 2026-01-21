@@ -8,3 +8,6 @@ package v1alpha1
 
 // Hub marks this type as a conversion hub.
 func (tr *Network) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *Subnet) Hub() {}
