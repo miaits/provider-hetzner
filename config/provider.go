@@ -6,7 +6,9 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
+	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
+	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	serverNamespaced "github.com/miaits/provider-hetzner/config/namespaced/server"
 )
 
@@ -33,6 +35,7 @@ func GetProvider() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
+		networkCluster.Configure,
 		serverCluster.Configure,
 	} {
 		configure(pc)
@@ -57,6 +60,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
+		networkNamespaced.Configure,
 		serverNamespaced.Configure,
 	} {
 		configure(pc)

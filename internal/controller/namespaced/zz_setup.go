@@ -9,6 +9,7 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
+	network "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/network"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/namespaced/providerconfig"
 	server "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/server"
 )
@@ -17,6 +18,7 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		network.Setup,
 		providerconfig.Setup,
 		server.Setup,
 	} {
@@ -31,6 +33,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // the supplied manager gated.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		network.SetupGated,
 		providerconfig.SetupGated,
 		server.SetupGated,
 	} {

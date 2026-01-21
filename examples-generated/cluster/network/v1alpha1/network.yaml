@@ -1,0 +1,12 @@
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/network
+  labels:
+    testing.upbound.io/example-name: privNet
+  name: privnet
+spec:
+  forProvider:
+    ipRange: 10.0.1.0/24
+    name: my-net
