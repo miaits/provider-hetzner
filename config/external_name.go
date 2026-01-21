@@ -34,33 +34,47 @@ func idWithStub() config.ExternalName {
 func loadBalancerNetworkExternalName() config.ExternalName {
 	base := config.TemplatedStringAsIdentifier("", "{{ .parameters.load_balancer_id }}-{{ .parameters.network_id }}")
 	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
-		loadBalancerID, ok := parameters["load_balancer_id"]
-		if !ok || loadBalancerID == nil || loadBalancerID == "" {
-			return "", fmt.Errorf("load_balancer_id not set")
+		idParams, err := loadBalancerNetworkIDParams(parameters)
+		if err != nil {
+			return "", err
 		}
-
-		networkID := parameters["network_id"]
-		if networkID == nil || networkID == "" {
-			subnetID, ok := parameters["subnet_id"]
-			if !ok || subnetID == nil || subnetID == "" {
-				return "", fmt.Errorf("network_id or subnet_id must be set")
-			}
-			derivedNetworkID, err := networkIDFromSubnetID(subnetID)
-			if err != nil {
-				return "", err
-			}
-			networkID = derivedNetworkID
-		}
-
-		idParams := make(map[string]any, len(parameters)+2)
-		for key, value := range parameters {
-			idParams[key] = value
-		}
-		idParams["load_balancer_id"] = numericIDToString(loadBalancerID)
-		idParams["network_id"] = numericIDToString(networkID)
-
 		return fn(ctx, externalName, idParams, terraformProviderConfig)
 	}))
+}
+
+func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, error) {
+	loadBalancerID, ok := parameters["load_balancer_id"]
+	if !ok || loadBalancerID == nil || loadBalancerID == "" {
+		return nil, fmt.Errorf("load_balancer_id not set")
+	}
+
+	networkID, err := resolveNetworkID(parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	idParams := make(map[string]any, len(parameters)+2)
+	for key, value := range parameters {
+		idParams[key] = value
+	}
+	idParams["load_balancer_id"] = numericIDToString(loadBalancerID)
+	idParams["network_id"] = numericIDToString(networkID)
+
+	return idParams, nil
+}
+
+func resolveNetworkID(parameters map[string]any) (any, error) {
+	networkID := parameters["network_id"]
+	if networkID != nil && networkID != "" {
+		return networkID, nil
+	}
+
+	subnetID, ok := parameters["subnet_id"]
+	if !ok || subnetID == nil || subnetID == "" {
+		return nil, fmt.Errorf("network_id or subnet_id must be set")
+	}
+
+	return networkIDFromSubnetID(subnetID)
 }
 
 func networkIDFromSubnetID(subnetID any) (string, error) {
@@ -74,30 +88,6 @@ func networkIDFromSubnetID(subnetID any) (string, error) {
 
 func numericIDToString(value any) string {
 	switch v := value.(type) {
-	case string:
-		return v
-	case fmt.Stringer:
-		return v.String()
-	case int:
-		return strconv.FormatInt(int64(v), 10)
-	case int8:
-		return strconv.FormatInt(int64(v), 10)
-	case int16:
-		return strconv.FormatInt(int64(v), 10)
-	case int32:
-		return strconv.FormatInt(int64(v), 10)
-	case int64:
-		return strconv.FormatInt(v, 10)
-	case uint:
-		return strconv.FormatUint(uint64(v), 10)
-	case uint8:
-		return strconv.FormatUint(uint64(v), 10)
-	case uint16:
-		return strconv.FormatUint(uint64(v), 10)
-	case uint32:
-		return strconv.FormatUint(uint64(v), 10)
-	case uint64:
-		return strconv.FormatUint(v, 10)
 	case float32:
 		return strconv.FormatFloat(float64(v), 'f', 0, 64)
 	case float64:
