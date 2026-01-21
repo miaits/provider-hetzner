@@ -1,0 +1,30 @@
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Route
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/route
+  labels:
+    testing.upbound.io/example-name: privNet
+  name: privnet
+  namespace: crossplane-system
+spec:
+  forProvider:
+    destination: 10.100.1.0/24
+    gateway: 10.0.1.1
+    networkId: 11860000
+
+---
+
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/route
+  labels:
+    testing.upbound.io/example-name: mynet
+  name: mynet
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ipRange: 10.0.0.0/8
+    name: my-net
