@@ -11,7 +11,9 @@ spec:
   forProvider:
     destination: 10.100.1.0/24
     gateway: 10.0.1.1
-    networkId: 11860000
+    networkIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: mynet
 
 ---
 

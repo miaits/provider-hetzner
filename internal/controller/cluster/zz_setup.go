@@ -9,6 +9,8 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
+	balancer "github.com/miaits/provider-hetzner/internal/controller/cluster/loadbalancer/balancer"
+	balancernetwork "github.com/miaits/provider-hetzner/internal/controller/cluster/loadbalancer/balancernetwork"
 	network "github.com/miaits/provider-hetzner/internal/controller/cluster/network/network"
 	route "github.com/miaits/provider-hetzner/internal/controller/cluster/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/cluster/network/subnet"
@@ -20,6 +22,8 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		balancer.Setup,
+		balancernetwork.Setup,
 		network.Setup,
 		route.Setup,
 		subnet.Setup,
@@ -37,6 +41,8 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // the supplied manager gated.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		balancer.SetupGated,
+		balancernetwork.SetupGated,
 		network.SetupGated,
 		route.SetupGated,
 		subnet.SetupGated,

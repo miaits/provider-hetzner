@@ -22,7 +22,16 @@ type RouteInitParameters struct {
 	Gateway *string `json:"gateway,omitempty" tf:"gateway,omitempty"`
 
 	// ID of the Network the route should be added to.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Network
 	NetworkID *float64 `json:"networkId,omitempty" tf:"network_id,omitempty"`
+
+	// Reference to a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDRef *v1.Reference `json:"networkIdRef,omitempty" tf:"-"`
+
+	// Selector for a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDSelector *v1.Selector `json:"networkIdSelector,omitempty" tf:"-"`
 }
 
 type RouteObservation struct {
@@ -51,8 +60,17 @@ type RouteParameters struct {
 	Gateway *string `json:"gateway,omitempty" tf:"gateway,omitempty"`
 
 	// ID of the Network the route should be added to.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Network
 	// +kubebuilder:validation:Optional
 	NetworkID *float64 `json:"networkId,omitempty" tf:"network_id,omitempty"`
+
+	// Reference to a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDRef *v1.Reference `json:"networkIdRef,omitempty" tf:"-"`
+
+	// Selector for a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDSelector *v1.Selector `json:"networkIdSelector,omitempty" tf:"-"`
 }
 
 // RouteSpec defines the desired state of Route
@@ -93,7 +111,6 @@ type Route struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.destination) || (has(self.initProvider) && has(self.initProvider.destination))",message="spec.forProvider.destination is a required parameter"
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.gateway) || (has(self.initProvider) && has(self.initProvider.gateway))",message="spec.forProvider.gateway is a required parameter"
-	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.networkId) || (has(self.initProvider) && has(self.initProvider.networkId))",message="spec.forProvider.networkId is a required parameter"
 	Spec   RouteSpec   `json:"spec"`
 	Status RouteStatus `json:"status,omitempty"`
 }

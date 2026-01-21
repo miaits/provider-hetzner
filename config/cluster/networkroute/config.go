@@ -8,8 +8,8 @@ import (
 func Configure(p *config.Provider) {
 	p.AddResourceConfigurator("hcloud_network_route", func(r *config.Resource) {
 		r.ShortGroup = "network"
-		r.References["network"] = config.Reference{
-			Type: "github.com/miaits/provider-hetzner/apis/namespaced/network/v1alpha1.Network",
+		r.References["network_id"] = config.Reference{
+			TerraformName: "hcloud_network",
 		}
 	})
 }
