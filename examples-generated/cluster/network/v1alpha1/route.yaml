@@ -1,0 +1,28 @@
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Route
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/route
+  labels:
+    testing.upbound.io/example-name: privNet
+  name: privnet
+spec:
+  forProvider:
+    destination: 10.100.1.0/24
+    gateway: 10.0.1.1
+    networkId: ${hcloud_network.mynet.id}
+
+---
+
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/route
+  labels:
+    testing.upbound.io/example-name: mynet
+  name: mynet
+spec:
+  forProvider:
+    ipRange: 10.0.0.0/8
+    name: my-net

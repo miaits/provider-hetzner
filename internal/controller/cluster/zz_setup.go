@@ -10,6 +10,7 @@ import (
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
 	network "github.com/miaits/provider-hetzner/internal/controller/cluster/network/network"
+	route "github.com/miaits/provider-hetzner/internal/controller/cluster/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/cluster/network/subnet"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/cluster/providerconfig"
 	server "github.com/miaits/provider-hetzner/internal/controller/cluster/server/server"
@@ -20,6 +21,7 @@ import (
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		network.Setup,
+		route.Setup,
 		subnet.Setup,
 		providerconfig.Setup,
 		server.Setup,
@@ -36,6 +38,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		network.SetupGated,
+		route.SetupGated,
 		subnet.SetupGated,
 		providerconfig.SetupGated,
 		server.SetupGated,
