@@ -19,7 +19,16 @@ type SubnetInitParameters struct {
 	IPRange *string `json:"ipRange,omitempty" tf:"ip_range,omitempty"`
 
 	// ID of the Network the subnet should be added to.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Network
 	NetworkID *float64 `json:"networkId,omitempty" tf:"network_id,omitempty"`
+
+	// Reference to a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDRef *v1.Reference `json:"networkIdRef,omitempty" tf:"-"`
+
+	// Selector for a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDSelector *v1.Selector `json:"networkIdSelector,omitempty" tf:"-"`
 
 	// Name of network zone.
 	NetworkZone *string `json:"networkZone,omitempty" tf:"network_zone,omitempty"`
@@ -60,8 +69,17 @@ type SubnetParameters struct {
 	IPRange *string `json:"ipRange,omitempty" tf:"ip_range,omitempty"`
 
 	// ID of the Network the subnet should be added to.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Network
 	// +kubebuilder:validation:Optional
 	NetworkID *float64 `json:"networkId,omitempty" tf:"network_id,omitempty"`
+
+	// Reference to a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDRef *v1.Reference `json:"networkIdRef,omitempty" tf:"-"`
+
+	// Selector for a Network in network to populate networkId.
+	// +kubebuilder:validation:Optional
+	NetworkIDSelector *v1.Selector `json:"networkIdSelector,omitempty" tf:"-"`
 
 	// Name of network zone.
 	// +kubebuilder:validation:Optional
@@ -113,7 +131,6 @@ type Subnet struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.ipRange) || (has(self.initProvider) && has(self.initProvider.ipRange))",message="spec.forProvider.ipRange is a required parameter"
-	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.networkId) || (has(self.initProvider) && has(self.initProvider.networkId))",message="spec.forProvider.networkId is a required parameter"
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.networkZone) || (has(self.initProvider) && has(self.initProvider.networkZone))",message="spec.forProvider.networkZone is a required parameter"
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.type) || (has(self.initProvider) && has(self.initProvider.type))",message="spec.forProvider.type is a required parameter"
 	Spec   SubnetSpec   `json:"spec"`

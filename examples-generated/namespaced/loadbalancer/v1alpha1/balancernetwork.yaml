@@ -1,0 +1,71 @@
+apiVersion: loadbalancer.hetzner.m.crossplane.io/v1alpha1
+kind: BalancerNetwork
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancernetwork
+  labels:
+    testing.upbound.io/example-name: attachment
+  name: attachment
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ip: 10.0.1.5
+    loadBalancerIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: main
+    subnetIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: subnet
+
+---
+
+apiVersion: loadbalancer.hetzner.m.crossplane.io/v1alpha1
+kind: Balancer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancernetwork
+  labels:
+    testing.upbound.io/example-name: main
+  name: main
+  namespace: crossplane-system
+spec:
+  forProvider:
+    loadBalancerType: lb11
+    name: main
+    networkZone: eu-central
+
+---
+
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancernetwork
+  labels:
+    testing.upbound.io/example-name: network
+  name: network
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ipRange: 10.0.0.0/16
+    name: network
+
+---
+
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Subnet
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancernetwork
+  labels:
+    testing.upbound.io/example-name: subnet
+  name: subnet
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ipRange: 10.0.1.0/24
+    networkIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: network
+    networkZone: eu-central
+    type: cloud

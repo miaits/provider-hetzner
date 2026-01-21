@@ -27,5 +27,5 @@ metadata:
 spec:
   forProvider:
     image: ubuntu-24.04
-    name: server-1
+    name: server-%d
     serverType: cx23
