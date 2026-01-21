@@ -1,0 +1,29 @@
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Subnet
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/subnet
+  labels:
+    testing.upbound.io/example-name: foonet
+  name: foonet
+spec:
+  forProvider:
+    ipRange: 10.0.1.0/24
+    networkId: ${hcloud_network.mynet.id}
+    networkZone: eu-central
+    type: cloud
+
+---
+
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/subnet
+  labels:
+    testing.upbound.io/example-name: mynet
+  name: mynet
+spec:
+  forProvider:
+    ipRange: 10.0.0.0/8
+    name: my-net
