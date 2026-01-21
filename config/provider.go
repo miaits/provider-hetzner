@@ -6,10 +6,12 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
+	loadBalancerCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancer"
 	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
+	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
@@ -42,6 +44,7 @@ func GetProvider() *ujconfig.Provider {
 		networkCluster.Configure,
 		networkSubnetCluster.Configure,
 		networkRouteCluster.Configure,
+		loadBalancerCluster.Configure,
 		serverCluster.Configure,
 	} {
 		configure(pc)
@@ -69,6 +72,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		networkNamespaced.Configure,
 		networkSubnetNamespaced.Configure,
 		networkRouteNamespaced.Configure,
+		loadBalancerNamespaced.Configure,
 		serverNamespaced.Configure,
 	} {
 		configure(pc)

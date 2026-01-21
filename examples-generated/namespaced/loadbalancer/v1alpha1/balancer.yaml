@@ -1,0 +1,31 @@
+apiVersion: loadbalancer.hetzner.m.crossplane.io/v1alpha1
+kind: Balancer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancer
+  labels:
+    testing.upbound.io/example-name: load_balancer
+  name: load-balancer
+  namespace: crossplane-system
+spec:
+  forProvider:
+    loadBalancerType: lb11
+    location: nbg1
+    name: my-load-balancer
+
+---
+
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancer
+  labels:
+    testing.upbound.io/example-name: my_server
+  name: my-server
+  namespace: crossplane-system
+spec:
+  forProvider:
+    image: ubuntu-24.04
+    name: server-1
+    serverType: cx23

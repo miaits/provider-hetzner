@@ -12,6 +12,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_network":        config.IdentifierFromProvider,
 	"hcloud_network_subnet": config.IdentifierFromProvider,
 	"hcloud_network_route":  config.IdentifierFromProvider,
+	"hcloud_load_balancer":  config.IdentifierFromProvider,
 	"hcloud_server":         config.IdentifierFromProvider,
 }
 
