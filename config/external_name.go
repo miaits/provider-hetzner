@@ -127,28 +127,48 @@ func loadBalancerTargetID(parameters map[string]any) (string, error) {
 }
 
 func loadBalancerTargetIdentifier(targetType string, parameters map[string]any) (string, error) {
-	switch targetType {
-	case "server":
-		serverID, ok := parameters["server_id"]
-		if !ok || serverID == nil || serverID == "" {
-			return "", fmt.Errorf("server_id not set")
-		}
-		return numericIDToString(serverID), nil
-	case "label_selector":
-		labelSelector, ok := parameters["label_selector"]
-		if !ok || labelSelector == nil || labelSelector == "" {
-			return "", fmt.Errorf("label_selector not set")
-		}
-		return fmt.Sprint(labelSelector), nil
-	case "ip":
-		ip, ok := parameters["ip"]
-		if !ok || ip == nil || ip == "" {
-			return "", fmt.Errorf("ip not set")
-		}
-		return fmt.Sprint(ip), nil
-	default:
+	identifierFns := map[string]func(map[string]any) (string, error){
+		"server":         loadBalancerTargetServerIdentifier,
+		"label_selector": loadBalancerTargetLabelSelectorIdentifier,
+		"ip":             loadBalancerTargetIPIdentifier,
+	}
+	fn, ok := identifierFns[targetType]
+	if !ok {
 		return "", fmt.Errorf("unexpected type %q", targetType)
 	}
+	return fn(parameters)
+}
+
+func loadBalancerTargetServerIdentifier(parameters map[string]any) (string, error) {
+	value, err := requiredParameter(parameters, "server_id")
+	if err != nil {
+		return "", err
+	}
+	return numericIDToString(value), nil
+}
+
+func loadBalancerTargetLabelSelectorIdentifier(parameters map[string]any) (string, error) {
+	return requiredStringParameter(parameters, "label_selector")
+}
+
+func loadBalancerTargetIPIdentifier(parameters map[string]any) (string, error) {
+	return requiredStringParameter(parameters, "ip")
+}
+
+func requiredParameter(parameters map[string]any, key string) (any, error) {
+	value, ok := parameters[key]
+	if !ok || value == nil || value == "" {
+		return nil, fmt.Errorf("%s not set", key)
+	}
+	return value, nil
+}
+
+func requiredStringParameter(parameters map[string]any, key string) (string, error) {
+	value, err := requiredParameter(parameters, key)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprint(value), nil
 }
 
 func resolveListenPort(parameters map[string]any) (any, error) {
