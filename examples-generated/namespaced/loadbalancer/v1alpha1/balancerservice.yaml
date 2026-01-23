@@ -20,7 +20,6 @@ spec:
       interval: 10
       port: 80
       protocol: http
-      retries: 3
       timeout: 5
     http:
     - cookieName: EXAMPLE_STICKY

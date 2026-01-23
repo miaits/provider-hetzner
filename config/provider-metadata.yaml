@@ -405,7 +405,6 @@ resources:
                       "interval": 10,
                       "port": 80,
                       "protocol": "http",
-                      "retries": 3,
                       "timeout": 5
                     }
                   ],
@@ -1479,4 +1478,3 @@ resources:
             - |-
               terraform import hcloud_zone_rrset.example "$ZONE_ID_OR_NAME/$RRSET_NAME/$RRSET_TYPE"
               terraform import hcloud_zone_rrset.example "$ZONE_ID_OR_NAME/$RRSET_ID"
-

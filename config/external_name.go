@@ -20,6 +20,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_load_balancer":         config.IdentifierFromProvider,
 	"hcloud_load_balancer_network": loadBalancerNetworkExternalName(),
 	"hcloud_load_balancer_service": loadBalancerServiceExternalName(),
+	"hcloud_load_balancer_target":  loadBalancerTargetExternalName(),
 	"hcloud_server":                config.IdentifierFromProvider,
 }
 
@@ -52,6 +53,15 @@ func loadBalancerServiceExternalName() config.ExternalName {
 		}
 		return fn(ctx, externalName, idParams, terraformProviderConfig)
 	}))
+}
+
+func loadBalancerTargetExternalName() config.ExternalName {
+	e := config.IdentifierFromProvider
+	e.IdentifierFields = []string{"load_balancer_id", "type", "server_id", "label_selector", "ip"}
+	e.GetIDFn = func(_ context.Context, _ string, parameters map[string]any, _ map[string]any) (string, error) {
+		return loadBalancerTargetID(parameters)
+	}
+	return e
 }
 
 func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, error) {
@@ -94,6 +104,51 @@ func loadBalancerServiceIDParams(parameters map[string]any) (map[string]any, err
 	idParams["listen_port"] = numericIDToString(listenPort)
 
 	return idParams, nil
+}
+
+func loadBalancerTargetID(parameters map[string]any) (string, error) {
+	loadBalancerID, ok := parameters["load_balancer_id"]
+	if !ok || loadBalancerID == nil || loadBalancerID == "" {
+		return "", fmt.Errorf("load_balancer_id not set")
+	}
+
+	targetType, ok := parameters["type"]
+	if !ok || targetType == nil || targetType == "" {
+		return "", fmt.Errorf("type not set")
+	}
+
+	normalizedType := strings.ToLower(fmt.Sprint(targetType))
+	identifier, err := loadBalancerTargetIdentifier(normalizedType, parameters)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s__%s__%s", numericIDToString(loadBalancerID), normalizedType, identifier), nil
+}
+
+func loadBalancerTargetIdentifier(targetType string, parameters map[string]any) (string, error) {
+	switch targetType {
+	case "server":
+		serverID, ok := parameters["server_id"]
+		if !ok || serverID == nil || serverID == "" {
+			return "", fmt.Errorf("server_id not set")
+		}
+		return numericIDToString(serverID), nil
+	case "label_selector":
+		labelSelector, ok := parameters["label_selector"]
+		if !ok || labelSelector == nil || labelSelector == "" {
+			return "", fmt.Errorf("label_selector not set")
+		}
+		return fmt.Sprint(labelSelector), nil
+	case "ip":
+		ip, ok := parameters["ip"]
+		if !ok || ip == nil || ip == "" {
+			return "", fmt.Errorf("ip not set")
+		}
+		return fmt.Sprint(ip), nil
+	default:
+		return "", fmt.Errorf("unexpected type %q", targetType)
+	}
 }
 
 func resolveListenPort(parameters map[string]any) (any, error) {
