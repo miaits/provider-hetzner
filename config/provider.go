@@ -8,12 +8,16 @@ import (
 
 	loadBalancerCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancer"
 	loadBalancerNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancernetwork"
+	loadBalancerServiceCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancerservice"
+	loadBalancerTargetCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancertarget"
 	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
 	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	loadBalancerNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancernetwork"
+	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
+	loadBalancerTargetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancertarget"
 	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
@@ -48,6 +52,8 @@ func GetProvider() *ujconfig.Provider {
 		networkRouteCluster.Configure,
 		loadBalancerCluster.Configure,
 		loadBalancerNetworkCluster.Configure,
+		loadBalancerServiceCluster.Configure,
+		loadBalancerTargetCluster.Configure,
 		serverCluster.Configure,
 	} {
 		configure(pc)
@@ -77,6 +83,8 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		networkRouteNamespaced.Configure,
 		loadBalancerNamespaced.Configure,
 		loadBalancerNetworkNamespaced.Configure,
+		loadBalancerServiceNamespaced.Configure,
+		loadBalancerTargetNamespaced.Configure,
 		serverNamespaced.Configure,
 	} {
 		configure(pc)

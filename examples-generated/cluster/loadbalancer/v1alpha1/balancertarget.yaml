@@ -1,24 +1,8 @@
 apiVersion: loadbalancer.hetzner.crossplane.io/v1alpha1
-kind: Balancer
-metadata:
-  annotations:
-    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancer
-  labels:
-    testing.upbound.io/example-name: load_balancer
-  name: load-balancer
-spec:
-  forProvider:
-    loadBalancerType: lb11
-    location: nbg1
-    name: my-load-balancer
-
----
-
-apiVersion: loadbalancer.hetzner.crossplane.io/v1alpha1
 kind: BalancerTarget
 metadata:
   annotations:
-    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancer
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancertarget
   labels:
     testing.upbound.io/example-name: load_balancer_target
   name: load-balancer-target
@@ -34,16 +18,32 @@ spec:
 
 ---
 
+apiVersion: loadbalancer.hetzner.crossplane.io/v1alpha1
+kind: Balancer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancertarget
+  labels:
+    testing.upbound.io/example-name: load_balancer
+  name: load-balancer
+spec:
+  forProvider:
+    loadBalancerType: lb11
+    location: nbg1
+    name: my-load-balancer
+
+---
+
 apiVersion: server.hetzner.crossplane.io/v1alpha1
 kind: Server
 metadata:
   annotations:
-    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancer
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancertarget
   labels:
     testing.upbound.io/example-name: my_server
   name: my-server
 spec:
   forProvider:
     image: ubuntu-24.04
-    name: server-%d
+    name: my-server
     serverType: cx23

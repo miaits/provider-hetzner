@@ -10,6 +10,7 @@ import (
 	"context"
 	reference "github.com/crossplane/crossplane-runtime/v2/pkg/reference"
 	v1alpha1 "github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1"
+	v1alpha11 "github.com/miaits/provider-hetzner/apis/cluster/server/v1alpha1"
 	errors "github.com/pkg/errors"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -88,6 +89,77 @@ func (mg *BalancerNetwork) ResolveReferences(ctx context.Context, c client.Reade
 	}
 	mg.Spec.InitProvider.SubnetID = reference.ToPtrValue(rsp.ResolvedValue)
 	mg.Spec.InitProvider.SubnetIDRef = rsp.ResolvedReference
+
+	return nil
+}
+
+// ResolveReferences of this BalancerService.
+func (mg *BalancerService) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPIResolver(c, mg)
+
+	var rsp reference.ResolutionResponse
+	var err error
+
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: reference.FromPtrValue(mg.Spec.ForProvider.LoadBalancerID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.ForProvider.LoadBalancerIDRef,
+		Selector:     mg.Spec.ForProvider.LoadBalancerIDSelector,
+		To: reference.To{
+			List:    &BalancerList{},
+			Managed: &Balancer{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.LoadBalancerID")
+	}
+	mg.Spec.ForProvider.LoadBalancerID = reference.ToPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.LoadBalancerIDRef = rsp.ResolvedReference
+
+	return nil
+}
+
+// ResolveReferences of this BalancerTarget.
+func (mg *BalancerTarget) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPIResolver(c, mg)
+
+	var rsp reference.ResolutionResponse
+	var err error
+
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: reference.FromFloatPtrValue(mg.Spec.ForProvider.LoadBalancerID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.ForProvider.LoadBalancerIDRef,
+		Selector:     mg.Spec.ForProvider.LoadBalancerIDSelector,
+		To: reference.To{
+			List:    &BalancerList{},
+			Managed: &Balancer{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.LoadBalancerID")
+	}
+	mg.Spec.ForProvider.LoadBalancerID = reference.ToFloatPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.LoadBalancerIDRef = rsp.ResolvedReference
+
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: reference.FromFloatPtrValue(mg.Spec.ForProvider.ServerID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.ForProvider.ServerIDRef,
+		Selector:     mg.Spec.ForProvider.ServerIDSelector,
+		To: reference.To{
+			List:    &v1alpha11.ServerList{},
+			Managed: &v1alpha11.Server{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.ServerID")
+	}
+	mg.Spec.ForProvider.ServerID = reference.ToFloatPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.ServerIDRef = rsp.ResolvedReference
 
 	return nil
 }
