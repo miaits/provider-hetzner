@@ -11,6 +11,7 @@ import (
 
 	balancer "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancer"
 	balancernetwork "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancernetwork"
+	balancerservice "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancerservice"
 	network "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/network"
 	route "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/subnet"
@@ -24,6 +25,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		balancer.Setup,
 		balancernetwork.Setup,
+		balancerservice.Setup,
 		network.Setup,
 		route.Setup,
 		subnet.Setup,
@@ -43,6 +45,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		balancer.SetupGated,
 		balancernetwork.SetupGated,
+		balancerservice.SetupGated,
 		network.SetupGated,
 		route.SetupGated,
 		subnet.SetupGated,

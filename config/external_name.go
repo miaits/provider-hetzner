@@ -19,6 +19,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_network_route":         config.IdentifierFromProvider,
 	"hcloud_load_balancer":         config.IdentifierFromProvider,
 	"hcloud_load_balancer_network": loadBalancerNetworkExternalName(),
+	"hcloud_load_balancer_service": loadBalancerServiceExternalName(),
 	"hcloud_server":                config.IdentifierFromProvider,
 }
 
@@ -35,6 +36,17 @@ func loadBalancerNetworkExternalName() config.ExternalName {
 	base := config.TemplatedStringAsIdentifier("", "{{ .parameters.load_balancer_id }}-{{ .parameters.network_id }}")
 	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
 		idParams, err := loadBalancerNetworkIDParams(parameters)
+		if err != nil {
+			return "", err
+		}
+		return fn(ctx, externalName, idParams, terraformProviderConfig)
+	}))
+}
+
+func loadBalancerServiceExternalName() config.ExternalName {
+	base := config.TemplatedStringAsIdentifier("", "{{ .parameters.load_balancer_id }}__{{ .parameters.listen_port }}")
+	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
+		idParams, err := loadBalancerServiceIDParams(parameters)
 		if err != nil {
 			return "", err
 		}
@@ -61,6 +73,50 @@ func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, err
 	idParams["network_id"] = numericIDToString(networkID)
 
 	return idParams, nil
+}
+
+func loadBalancerServiceIDParams(parameters map[string]any) (map[string]any, error) {
+	loadBalancerID, ok := parameters["load_balancer_id"]
+	if !ok || loadBalancerID == nil || loadBalancerID == "" {
+		return nil, fmt.Errorf("load_balancer_id not set")
+	}
+
+	listenPort, err := resolveListenPort(parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	idParams := make(map[string]any, len(parameters)+2)
+	for key, value := range parameters {
+		idParams[key] = value
+	}
+	idParams["load_balancer_id"] = numericIDToString(loadBalancerID)
+	idParams["listen_port"] = numericIDToString(listenPort)
+
+	return idParams, nil
+}
+
+func resolveListenPort(parameters map[string]any) (any, error) {
+	listenPort := parameters["listen_port"]
+	if listenPort != nil && listenPort != "" {
+		return listenPort, nil
+	}
+
+	protocol, ok := parameters["protocol"]
+	if !ok || protocol == nil || protocol == "" {
+		return nil, fmt.Errorf("listen_port not set and protocol not set")
+	}
+
+	switch strings.ToLower(fmt.Sprint(protocol)) {
+	case "http":
+		return 80, nil
+	case "https":
+		return 443, nil
+	case "tcp":
+		return nil, fmt.Errorf("listen_port not set")
+	default:
+		return nil, fmt.Errorf("listen_port not set and unexpected protocol %q", protocol)
+	}
 }
 
 func resolveNetworkID(parameters map[string]any) (any, error) {

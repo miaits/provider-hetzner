@@ -8,12 +8,14 @@ import (
 
 	loadBalancerCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancer"
 	loadBalancerNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancernetwork"
+	loadBalancerServiceCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancerservice"
 	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
 	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	loadBalancerNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancernetwork"
+	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
 	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
@@ -48,6 +50,7 @@ func GetProvider() *ujconfig.Provider {
 		networkRouteCluster.Configure,
 		loadBalancerCluster.Configure,
 		loadBalancerNetworkCluster.Configure,
+		loadBalancerServiceCluster.Configure,
 		serverCluster.Configure,
 	} {
 		configure(pc)
@@ -77,6 +80,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		networkRouteNamespaced.Configure,
 		loadBalancerNamespaced.Configure,
 		loadBalancerNetworkNamespaced.Configure,
+		loadBalancerServiceNamespaced.Configure,
 		serverNamespaced.Configure,
 	} {
 		configure(pc)

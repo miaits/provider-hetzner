@@ -91,3 +91,30 @@ func (mg *BalancerNetwork) ResolveReferences(ctx context.Context, c client.Reade
 
 	return nil
 }
+
+// ResolveReferences of this BalancerService.
+func (mg *BalancerService) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPINamespacedResolver(c, mg)
+
+	var rsp reference.NamespacedResolutionResponse
+	var err error
+
+	rsp, err = r.Resolve(ctx, reference.NamespacedResolutionRequest{
+		CurrentValue: reference.FromPtrValue(mg.Spec.ForProvider.LoadBalancerID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.ForProvider.LoadBalancerIDRef,
+		Selector:     mg.Spec.ForProvider.LoadBalancerIDSelector,
+		To: reference.To{
+			List:    &BalancerList{},
+			Managed: &Balancer{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.LoadBalancerID")
+	}
+	mg.Spec.ForProvider.LoadBalancerID = reference.ToPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.LoadBalancerIDRef = rsp.ResolvedReference
+
+	return nil
+}

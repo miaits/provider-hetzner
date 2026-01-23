@@ -11,3 +11,6 @@ func (tr *Balancer) Hub() {}
 
 // Hub marks this type as a conversion hub.
 func (tr *BalancerNetwork) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *BalancerService) Hub() {}

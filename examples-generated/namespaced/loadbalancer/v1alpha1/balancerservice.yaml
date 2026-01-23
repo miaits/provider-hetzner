@@ -1,0 +1,48 @@
+apiVersion: loadbalancer.hetzner.m.crossplane.io/v1alpha1
+kind: BalancerService
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancerservice
+  labels:
+    testing.upbound.io/example-name: load_balancer_service
+  name: load-balancer-service
+  namespace: crossplane-system
+spec:
+  forProvider:
+    healthCheck:
+    - http:
+      - domain: example.com
+        path: /healthz
+        response: OK
+        statusCodes:
+        - "200"
+        tls: true
+      interval: 10
+      port: 80
+      protocol: http
+      retries: 3
+      timeout: 5
+    http:
+    - cookieName: EXAMPLE_STICKY
+      stickySessions: true
+    loadBalancerIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: load_balancer
+    protocol: http
+
+---
+
+apiVersion: loadbalancer.hetzner.m.crossplane.io/v1alpha1
+kind: Balancer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: loadbalancer/v1alpha1/balancerservice
+  labels:
+    testing.upbound.io/example-name: load_balancer
+  name: load-balancer
+  namespace: crossplane-system
+spec:
+  forProvider:
+    loadBalancerType: lb11
+    location: nbg1
+    name: my-load-balancer
