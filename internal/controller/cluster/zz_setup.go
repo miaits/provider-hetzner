@@ -17,6 +17,7 @@ import (
 	route "github.com/miaits/provider-hetzner/internal/controller/cluster/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/cluster/network/subnet"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/cluster/providerconfig"
+	networkserver "github.com/miaits/provider-hetzner/internal/controller/cluster/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/cluster/server/server"
 )
 
@@ -32,6 +33,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		route.Setup,
 		subnet.Setup,
 		providerconfig.Setup,
+		networkserver.Setup,
 		server.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -53,6 +55,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		route.SetupGated,
 		subnet.SetupGated,
 		providerconfig.SetupGated,
+		networkserver.SetupGated,
 		server.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {

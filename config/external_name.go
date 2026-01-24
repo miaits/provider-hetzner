@@ -22,6 +22,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_load_balancer_service": loadBalancerServiceExternalName(),
 	"hcloud_load_balancer_target":  loadBalancerTargetExternalName(),
 	"hcloud_server":                config.IdentifierFromProvider,
+	"hcloud_server_network":        serverNetworkExternalName(),
 }
 
 func idWithStub() config.ExternalName {
@@ -64,6 +65,17 @@ func loadBalancerTargetExternalName() config.ExternalName {
 	return e
 }
 
+func serverNetworkExternalName() config.ExternalName {
+	base := config.TemplatedStringAsIdentifier("", "{{ .parameters.server_id }}-{{ .parameters.network_id }}")
+	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
+		idParams, err := serverNetworkIDParams(parameters)
+		if err != nil {
+			return "", err
+		}
+		return fn(ctx, externalName, idParams, terraformProviderConfig)
+	}))
+}
+
 func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, error) {
 	loadBalancerID, ok := parameters["load_balancer_id"]
 	if !ok || loadBalancerID == nil || loadBalancerID == "" {
@@ -80,6 +92,27 @@ func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, err
 		idParams[key] = value
 	}
 	idParams["load_balancer_id"] = numericIDToString(loadBalancerID)
+	idParams["network_id"] = numericIDToString(networkID)
+
+	return idParams, nil
+}
+
+func serverNetworkIDParams(parameters map[string]any) (map[string]any, error) {
+	serverID, ok := parameters["server_id"]
+	if !ok || serverID == nil || serverID == "" {
+		return nil, fmt.Errorf("server_id not set")
+	}
+
+	networkID, err := resolveNetworkID(parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	idParams := make(map[string]any, len(parameters)+2)
+	for key, value := range parameters {
+		idParams[key] = value
+	}
+	idParams["server_id"] = numericIDToString(serverID)
 	idParams["network_id"] = numericIDToString(networkID)
 
 	return idParams, nil
