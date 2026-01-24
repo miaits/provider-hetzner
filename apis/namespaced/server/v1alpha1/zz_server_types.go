@@ -142,7 +142,16 @@ type ServerInitParameters struct {
 	Network []NetworkInitParameters `json:"network,omitempty" tf:"network,omitempty"`
 
 	// Placement Group ID the server added to on creation.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/namespaced/server/v1alpha1.Group
 	PlacementGroupID *float64 `json:"placementGroupId,omitempty" tf:"placement_group_id,omitempty"`
+
+	// Reference to a Group in server to populate placementGroupId.
+	// +kubebuilder:validation:Optional
+	PlacementGroupIDRef *v1.NamespacedReference `json:"placementGroupIdRef,omitempty" tf:"-"`
+
+	// Selector for a Group in server to populate placementGroupId.
+	// +kubebuilder:validation:Optional
+	PlacementGroupIDSelector *v1.NamespacedSelector `json:"placementGroupIdSelector,omitempty" tf:"-"`
 
 	// In this block you can either enable / disable ipv4 and ipv6 or link existing primary IPs (checkout the examples).
 	// If this block is not defined, two primary (ipv4 & ipv6) ips getting auto generated.
@@ -322,8 +331,17 @@ type ServerParameters struct {
 	Network []NetworkParameters `json:"network,omitempty" tf:"network,omitempty"`
 
 	// Placement Group ID the server added to on creation.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/namespaced/server/v1alpha1.Group
 	// +kubebuilder:validation:Optional
 	PlacementGroupID *float64 `json:"placementGroupId,omitempty" tf:"placement_group_id,omitempty"`
+
+	// Reference to a Group in server to populate placementGroupId.
+	// +kubebuilder:validation:Optional
+	PlacementGroupIDRef *v1.NamespacedReference `json:"placementGroupIdRef,omitempty" tf:"-"`
+
+	// Selector for a Group in server to populate placementGroupId.
+	// +kubebuilder:validation:Optional
+	PlacementGroupIDSelector *v1.NamespacedSelector `json:"placementGroupIdSelector,omitempty" tf:"-"`
 
 	// In this block you can either enable / disable ipv4 and ipv6 or link existing primary IPs (checkout the examples).
 	// If this block is not defined, two primary (ipv4 & ipv6) ips getting auto generated.

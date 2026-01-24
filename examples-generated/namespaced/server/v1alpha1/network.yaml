@@ -1,0 +1,73 @@
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/network
+  labels:
+    testing.upbound.io/example-name: node1_subnet1
+  name: node1-subnet1
+  namespace: crossplane-system
+spec:
+  forProvider:
+    aliasIps:
+    - 10.0.1.10
+    ip: 10.0.1.5
+    serverIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: node1
+    subnetIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: subnet1
+
+---
+
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/network
+  labels:
+    testing.upbound.io/example-name: network
+  name: network
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ipRange: 10.0.0.0/16
+    name: network
+
+---
+
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Subnet
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/network
+  labels:
+    testing.upbound.io/example-name: subnet1
+  name: subnet1
+  namespace: crossplane-system
+spec:
+  forProvider:
+    ipRange: 10.0.1.0/24
+    networkIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: network
+    networkZone: eu-central
+    type: cloud
+
+---
+
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/network
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+  namespace: crossplane-system
+spec:
+  forProvider:
+    image: debian-12
+    name: node1
+    serverType: cx23

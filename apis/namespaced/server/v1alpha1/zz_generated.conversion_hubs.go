@@ -7,4 +7,10 @@
 package v1alpha1
 
 // Hub marks this type as a conversion hub.
+func (tr *Group) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *Network) Hub() {}
+
+// Hub marks this type as a conversion hub.
 func (tr *Server) Hub() {}
