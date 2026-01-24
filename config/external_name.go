@@ -21,6 +21,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_load_balancer_network": loadBalancerNetworkExternalName(),
 	"hcloud_load_balancer_service": loadBalancerServiceExternalName(),
 	"hcloud_load_balancer_target":  loadBalancerTargetExternalName(),
+	"hcloud_placement_group":       config.IdentifierFromProvider,
 	"hcloud_server":                config.IdentifierFromProvider,
 	"hcloud_server_network":        serverNetworkExternalName(),
 }

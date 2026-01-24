@@ -1,0 +1,33 @@
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Group
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/group
+  labels:
+    testing.upbound.io/example-name: my-placement-group
+  name: my-placement-group
+spec:
+  forProvider:
+    labels:
+      key: value
+    name: my-placement-group
+    type: spread
+
+---
+
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/group
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+spec:
+  forProvider:
+    image: debian-12
+    name: node1
+    placementGroupIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: my-placement-group
+    serverType: cx23
