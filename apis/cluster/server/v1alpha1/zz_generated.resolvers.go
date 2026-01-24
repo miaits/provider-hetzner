@@ -97,7 +97,25 @@ func (mg *Server) ResolveReferences(ctx context.Context, c client.Reader) error 
 	r := reference.NewAPIResolver(c, mg)
 
 	var rsp reference.ResolutionResponse
+	var mrsp reference.MultiResolutionResponse
 	var err error
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiResolutionRequest{
+		CurrentValues: reference.FromFloatPtrValues(mg.Spec.ForProvider.FirewallIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.FirewallIdsRefs,
+		Selector:      mg.Spec.ForProvider.FirewallIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.FirewallList{},
+			Managed: &v1alpha1.Firewall{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.FirewallIds")
+	}
+	mg.Spec.ForProvider.FirewallIds = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.FirewallIdsRefs = mrsp.ResolvedReferences
 
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: reference.FromFloatPtrValue(mg.Spec.ForProvider.PlacementGroupID),
@@ -115,6 +133,23 @@ func (mg *Server) ResolveReferences(ctx context.Context, c client.Reader) error 
 	}
 	mg.Spec.ForProvider.PlacementGroupID = reference.ToFloatPtrValue(rsp.ResolvedValue)
 	mg.Spec.ForProvider.PlacementGroupIDRef = rsp.ResolvedReference
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiResolutionRequest{
+		CurrentValues: reference.FromFloatPtrValues(mg.Spec.InitProvider.FirewallIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.FirewallIdsRefs,
+		Selector:      mg.Spec.InitProvider.FirewallIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.FirewallList{},
+			Managed: &v1alpha1.Firewall{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.FirewallIds")
+	}
+	mg.Spec.InitProvider.FirewallIds = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.FirewallIdsRefs = mrsp.ResolvedReferences
 
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: reference.FromFloatPtrValue(mg.Spec.InitProvider.PlacementGroupID),

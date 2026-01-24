@@ -6,6 +6,7 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
+	firewallCluster "github.com/miaits/provider-hetzner/config/cluster/firewall"
 	loadBalancerCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancer"
 	loadBalancerNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancernetwork"
 	loadBalancerServiceCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancerservice"
@@ -17,6 +18,7 @@ import (
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
 	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
 	snapshotCluster "github.com/miaits/provider-hetzner/config/cluster/snapshot"
+	firewallNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewall"
 	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	loadBalancerNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancernetwork"
 	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
@@ -60,6 +62,7 @@ func GetProvider() *ujconfig.Provider {
 		loadBalancerNetworkCluster.Configure,
 		loadBalancerServiceCluster.Configure,
 		loadBalancerTargetCluster.Configure,
+		firewallCluster.Configure,
 		placementGroupCluster.Configure,
 		snapshotCluster.Configure,
 		serverCluster.Configure,
@@ -94,6 +97,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		loadBalancerNetworkNamespaced.Configure,
 		loadBalancerServiceNamespaced.Configure,
 		loadBalancerTargetNamespaced.Configure,
+		firewallNamespaced.Configure,
 		placementGroupNamespaced.Configure,
 		snapshotNamespaced.Configure,
 		serverNamespaced.Configure,

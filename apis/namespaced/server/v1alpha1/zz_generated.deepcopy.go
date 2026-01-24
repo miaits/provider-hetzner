@@ -797,6 +797,18 @@ func (in *ServerInitParameters) DeepCopyInto(out *ServerInitParameters) {
 			}
 		}
 	}
+	if in.FirewallIdsRefs != nil {
+		in, out := &in.FirewallIdsRefs, &out.FirewallIdsRefs
+		*out = make([]v1.NamespacedReference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.FirewallIdsSelector != nil {
+		in, out := &in.FirewallIdsSelector, &out.FirewallIdsSelector
+		*out = new(v1.NamespacedSelector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.IgnoreRemoteFirewallIds != nil {
 		in, out := &in.IgnoreRemoteFirewallIds, &out.IgnoreRemoteFirewallIds
 		*out = new(bool)
@@ -1167,6 +1179,18 @@ func (in *ServerParameters) DeepCopyInto(out *ServerParameters) {
 				**out = **in
 			}
 		}
+	}
+	if in.FirewallIdsRefs != nil {
+		in, out := &in.FirewallIdsRefs, &out.FirewallIdsRefs
+		*out = make([]v1.NamespacedReference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.FirewallIdsSelector != nil {
+		in, out := &in.FirewallIdsSelector, &out.FirewallIdsSelector
+		*out = new(v1.NamespacedSelector)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.IgnoreRemoteFirewallIds != nil {
 		in, out := &in.IgnoreRemoteFirewallIds, &out.IgnoreRemoteFirewallIds

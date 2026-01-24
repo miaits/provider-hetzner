@@ -108,8 +108,17 @@ type ServerInitParameters struct {
 	DeleteProtection *bool `json:"deleteProtection,omitempty" tf:"delete_protection,omitempty"`
 
 	// Firewall IDs the server should be attached to on creation.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Firewall
 	// +listType=set
 	FirewallIds []*float64 `json:"firewallIds,omitempty" tf:"firewall_ids,omitempty"`
+
+	// References to Firewall in network to populate firewallIds.
+	// +kubebuilder:validation:Optional
+	FirewallIdsRefs []v1.Reference `json:"firewallIdsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Firewall in network to populate firewallIds.
+	// +kubebuilder:validation:Optional
+	FirewallIdsSelector *v1.Selector `json:"firewallIdsSelector,omitempty" tf:"-"`
 
 	// Ignores any updates
 	// to the firewall_ids argument which were received from the server.
@@ -288,9 +297,18 @@ type ServerParameters struct {
 	DeleteProtection *bool `json:"deleteProtection,omitempty" tf:"delete_protection,omitempty"`
 
 	// Firewall IDs the server should be attached to on creation.
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/cluster/network/v1alpha1.Firewall
 	// +kubebuilder:validation:Optional
 	// +listType=set
 	FirewallIds []*float64 `json:"firewallIds,omitempty" tf:"firewall_ids,omitempty"`
+
+	// References to Firewall in network to populate firewallIds.
+	// +kubebuilder:validation:Optional
+	FirewallIdsRefs []v1.Reference `json:"firewallIdsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Firewall in network to populate firewallIds.
+	// +kubebuilder:validation:Optional
+	FirewallIdsSelector *v1.Selector `json:"firewallIdsSelector,omitempty" tf:"-"`
 
 	// Ignores any updates
 	// to the firewall_ids argument which were received from the server.
