@@ -14,8 +14,8 @@ import (
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
 	placementGroupCluster "github.com/miaits/provider-hetzner/config/cluster/placementgroup"
-	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
+	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
 	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	loadBalancerNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancernetwork"
 	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
@@ -24,8 +24,8 @@ import (
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
 	placementGroupNamespaced "github.com/miaits/provider-hetzner/config/namespaced/placementgroup"
-	serverNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/servernetwork"
 	serverNamespaced "github.com/miaits/provider-hetzner/config/namespaced/server"
+	serverNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/servernetwork"
 )
 
 const (
