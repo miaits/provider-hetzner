@@ -1,0 +1,29 @@
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/snapshot
+  labels:
+    testing.upbound.io/example-name: my-snapshot
+  name: my-snapshot
+spec:
+  forProvider:
+    serverIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: node1
+
+---
+
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/snapshot
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+spec:
+  forProvider:
+    image: debian-12
+    name: node1
+    serverType: cx23

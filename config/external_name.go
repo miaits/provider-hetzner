@@ -24,6 +24,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_placement_group":       config.IdentifierFromProvider,
 	"hcloud_server":                config.IdentifierFromProvider,
 	"hcloud_server_network":        serverNetworkExternalName(),
+	"hcloud_snapshot":              config.IdentifierFromProvider,
 }
 
 func idWithStub() config.ExternalName {
