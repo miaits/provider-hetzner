@@ -23,6 +23,7 @@ import (
 	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
 	sshKeyCluster "github.com/miaits/provider-hetzner/config/cluster/sshkey"
 	snapshotCluster "github.com/miaits/provider-hetzner/config/cluster/snapshot"
+	volumeCluster "github.com/miaits/provider-hetzner/config/cluster/volume"
 	uploadedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/uploadedcertificate"
 	firewallNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewall"
 	firewallAttachmentNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewallattachment"
@@ -41,6 +42,7 @@ import (
 	serverNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/servernetwork"
 	sshKeyNamespaced "github.com/miaits/provider-hetzner/config/namespaced/sshkey"
 	snapshotNamespaced "github.com/miaits/provider-hetzner/config/namespaced/snapshot"
+	volumeNamespaced "github.com/miaits/provider-hetzner/config/namespaced/volume"
 	uploadedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/uploadedcertificate"
 )
 
@@ -85,6 +87,7 @@ func GetProvider() *ujconfig.Provider {
 		serverCluster.Configure,
 		serverNetworkCluster.Configure,
 		sshKeyCluster.Configure,
+		volumeCluster.Configure,
 	} {
 		configure(pc)
 	}
@@ -126,6 +129,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		serverNamespaced.Configure,
 		serverNetworkNamespaced.Configure,
 		sshKeyNamespaced.Configure,
+		volumeNamespaced.Configure,
 	} {
 		configure(pc)
 	}

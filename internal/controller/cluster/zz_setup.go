@@ -27,6 +27,7 @@ import (
 	networkserver "github.com/miaits/provider-hetzner/internal/controller/cluster/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/cluster/server/server"
 	snapshot "github.com/miaits/provider-hetzner/internal/controller/cluster/server/snapshot"
+	volume "github.com/miaits/provider-hetzner/internal/controller/cluster/server/volume"
 )
 
 // Setup creates all controllers with the supplied logger and adds them to
@@ -52,6 +53,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		networkserver.Setup,
 		server.Setup,
 		snapshot.Setup,
+		volume.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
@@ -83,6 +85,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		networkserver.SetupGated,
 		server.SetupGated,
 		snapshot.SetupGated,
+		volume.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
