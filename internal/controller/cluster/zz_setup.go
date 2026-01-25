@@ -13,6 +13,7 @@ import (
 	balancernetwork "github.com/miaits/provider-hetzner/internal/controller/cluster/loadbalancer/balancernetwork"
 	balancerservice "github.com/miaits/provider-hetzner/internal/controller/cluster/loadbalancer/balancerservice"
 	balancertarget "github.com/miaits/provider-hetzner/internal/controller/cluster/loadbalancer/balancertarget"
+	certificate "github.com/miaits/provider-hetzner/internal/controller/cluster/network/certificate"
 	firewall "github.com/miaits/provider-hetzner/internal/controller/cluster/network/firewall"
 	network "github.com/miaits/provider-hetzner/internal/controller/cluster/network/network"
 	route "github.com/miaits/provider-hetzner/internal/controller/cluster/network/route"
@@ -35,6 +36,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		balancernetwork.Setup,
 		balancerservice.Setup,
 		balancertarget.Setup,
+		certificate.Setup,
 		firewall.Setup,
 		network.Setup,
 		route.Setup,
@@ -63,6 +65,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		balancernetwork.SetupGated,
 		balancerservice.SetupGated,
 		balancertarget.SetupGated,
+		certificate.SetupGated,
 		firewall.SetupGated,
 		network.SetupGated,
 		route.SetupGated,

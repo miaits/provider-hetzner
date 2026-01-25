@@ -1,0 +1,17 @@
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Certificate
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/certificate
+  labels:
+    testing.upbound.io/example-name: managed_cert
+  name: managed-cert
+spec:
+  forProvider:
+    domainNames:
+    - '*.example.com'
+    - example.com
+    labels:
+      label_1: value_1
+      label_2: value_2
+    name: managed_cert

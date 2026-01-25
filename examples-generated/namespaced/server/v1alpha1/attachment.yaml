@@ -13,7 +13,7 @@ spec:
       matchLabels:
         testing.upbound.io/example-name: basic_firewall
     serverIdsRefs:
-    - name: test-server
+    - name: test_server
 
 ---
 
