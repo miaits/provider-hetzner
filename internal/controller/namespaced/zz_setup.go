@@ -20,6 +20,7 @@ import (
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/namespaced/providerconfig"
 	group "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/group"
 	ip "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/ip"
+	ipassignment "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/ipassignment"
 	networkserver "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/server"
 	snapshot "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/snapshot"
@@ -40,6 +41,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		providerconfig.Setup,
 		group.Setup,
 		ip.Setup,
+		ipassignment.Setup,
 		networkserver.Setup,
 		server.Setup,
 		snapshot.Setup,
@@ -66,6 +68,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		providerconfig.SetupGated,
 		group.SetupGated,
 		ip.SetupGated,
+		ipassignment.SetupGated,
 		networkserver.SetupGated,
 		server.SetupGated,
 		snapshot.SetupGated,
