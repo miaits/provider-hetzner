@@ -23,6 +23,7 @@ import (
 	group "github.com/miaits/provider-hetzner/internal/controller/cluster/server/group"
 	ip "github.com/miaits/provider-hetzner/internal/controller/cluster/server/ip"
 	ipassignment "github.com/miaits/provider-hetzner/internal/controller/cluster/server/ipassignment"
+	key "github.com/miaits/provider-hetzner/internal/controller/cluster/server/key"
 	networkserver "github.com/miaits/provider-hetzner/internal/controller/cluster/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/cluster/server/server"
 	snapshot "github.com/miaits/provider-hetzner/internal/controller/cluster/server/snapshot"
@@ -47,6 +48,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		group.Setup,
 		ip.Setup,
 		ipassignment.Setup,
+		key.Setup,
 		networkserver.Setup,
 		server.Setup,
 		snapshot.Setup,
@@ -77,6 +79,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		group.SetupGated,
 		ip.SetupGated,
 		ipassignment.SetupGated,
+		key.SetupGated,
 		networkserver.SetupGated,
 		server.SetupGated,
 		snapshot.SetupGated,

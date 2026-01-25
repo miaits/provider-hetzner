@@ -30,6 +30,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_floating_ip_assignment": config.IdentifierFromProvider,
 	"hcloud_server":                 config.IdentifierFromProvider,
 	"hcloud_server_network":         serverNetworkExternalName(),
+	"hcloud_ssh_key":                sshKeyExternalName(),
 	"hcloud_snapshot":               config.IdentifierFromProvider,
 }
 
@@ -81,6 +82,16 @@ func serverNetworkExternalName() config.ExternalName {
 			return "", err
 		}
 		return fn(ctx, externalName, idParams, terraformProviderConfig)
+	}))
+}
+
+func sshKeyExternalName() config.ExternalName {
+	base := config.IdentifierFromProvider
+	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
+		if externalName == "" {
+			return "0", nil
+		}
+		return fn(ctx, externalName, parameters, terraformProviderConfig)
 	}))
 }
 
