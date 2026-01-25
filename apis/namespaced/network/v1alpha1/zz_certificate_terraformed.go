@@ -16,12 +16,12 @@ import (
 
 // GetTerraformResourceType returns Terraform resource type for this Certificate
 func (mg *Certificate) GetTerraformResourceType() string {
-	return "hcloud_managed_certificate"
+	return "hcloud_uploaded_certificate"
 }
 
 // GetConnectionDetailsMapping for this Certificate
 func (tr *Certificate) GetConnectionDetailsMapping() map[string]string {
-	return nil
+	return map[string]string{"private_key": "privateKeySecretRef"}
 }
 
 // GetObservation of this Certificate
@@ -113,7 +113,7 @@ func (tr *Certificate) GetMergedParameters(shouldMergeInitProvider bool) (map[st
 // LateInitialize this Certificate using its observed tfState.
 // returns True if there are any spec changes for the resource.
 func (tr *Certificate) LateInitialize(attrs []byte) (bool, error) {
-	params := &CertificateParameters{}
+	params := &CertificateParameters_2{}
 	if err := json.TFParser.Unmarshal(attrs, params); err != nil {
 		return false, errors.Wrap(err, "failed to unmarshal Terraform state parameters for late-initialization")
 	}

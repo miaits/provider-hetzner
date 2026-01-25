@@ -34,8 +34,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Certificate is the Schema for the Certificates API. Obtain a
-          TLS Certificate managed by Hetzner Cloud.
+        description: Certificate is the Schema for the Certificates API. Upload a
+          TLS certificate to Hetzner Cloud.
         properties:
           apiVersion:
             description: |-
@@ -59,14 +59,9 @@ spec:
             properties:
               forProvider:
                 properties:
-                  domainNames:
-                    description: |-
-                      Domain names for which a certificate
-                      should be obtained.
-                    items:
-                      type: string
-                    type: array
-                    x-kubernetes-list-type: set
+                  certificate:
+                    description: PEM encoded TLS certificate.
+                    type: string
                   labels:
                     additionalProperties:
                       type: string
@@ -78,6 +73,18 @@ spec:
                   name:
                     description: Name of the Certificate.
                     type: string
+                  privateKeySecretRef:
+                    description: PEM encoded private key belonging to the certificate.
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
                 type: object
               initProvider:
                 description: |-
@@ -92,14 +99,9 @@ spec:
                   for example because of an external controller is managing them, like an
                   autoscaler.
                 properties:
-                  domainNames:
-                    description: |-
-                      Domain names for which a certificate
-                      should be obtained.
-                    items:
-                      type: string
-                    type: array
-                    x-kubernetes-list-type: set
+                  certificate:
+                    description: PEM encoded TLS certificate.
+                    type: string
                   labels:
                     additionalProperties:
                       type: string
@@ -111,6 +113,20 @@ spec:
                   name:
                     description: Name of the Certificate.
                     type: string
+                  privateKeySecretRef:
+                    description: PEM encoded private key belonging to the certificate.
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                required:
+                - privateKeySecretRef
                 type: object
               managementPolicies:
                 default:
@@ -171,34 +187,34 @@ spec:
             - forProvider
             type: object
             x-kubernetes-validations:
-            - message: spec.forProvider.domainNames is a required parameter
+            - message: spec.forProvider.certificate is a required parameter
               rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
-                || ''Update'' in self.managementPolicies) || has(self.forProvider.domainNames)
-                || (has(self.initProvider) && has(self.initProvider.domainNames))'
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.certificate)
+                || (has(self.initProvider) && has(self.initProvider.certificate))'
             - message: spec.forProvider.name is a required parameter
               rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
                 || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
                 || (has(self.initProvider) && has(self.initProvider.name))'
+            - message: spec.forProvider.privateKeySecretRef is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.privateKeySecretRef)'
           status:
             description: CertificateStatus defines the observed state of Certificate.
             properties:
               atProvider:
                 properties:
                   certificate:
-                    description: (string) PEM encoded TLS certificate.
+                    description: PEM encoded TLS certificate.
                     type: string
                   created:
                     description: (string) Point in time when the Certificate was created
                       at Hetzner Cloud (in ISO-8601 format).
                     type: string
                   domainNames:
-                    description: |-
-                      Domain names for which a certificate
-                      should be obtained.
+                    description: (list) Domains and subdomains covered by the certificate.
                     items:
                       type: string
                     type: array
-                    x-kubernetes-list-type: set
                   fingerprint:
                     description: (string) Fingerprint of the certificate.
                     type: string

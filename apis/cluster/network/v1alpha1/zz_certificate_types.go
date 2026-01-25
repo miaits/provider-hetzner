@@ -13,12 +13,10 @@ import (
 	v1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 )
 
-type CertificateInitParameters struct {
+type CertificateInitParameters_2 struct {
 
-	// Domain names for which a certificate
-	// should be obtained.
-	// +listType=set
-	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
+	// PEM encoded TLS certificate.
+	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
 
 	// User-defined labels (key-value pairs) the
 	// certificate should be created with.
@@ -27,19 +25,20 @@ type CertificateInitParameters struct {
 
 	// Name of the Certificate.
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
+
+	// PEM encoded private key belonging to the certificate.
+	PrivateKeySecretRef v1.SecretKeySelector `json:"privateKeySecretRef" tf:"-"`
 }
 
-type CertificateObservation struct {
+type CertificateObservation_2 struct {
 
-	// (string) PEM encoded TLS certificate.
+	// PEM encoded TLS certificate.
 	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
 
 	// (string) Point in time when the Certificate was created at Hetzner Cloud (in ISO-8601 format).
 	Created *string `json:"created,omitempty" tf:"created,omitempty"`
 
-	// Domain names for which a certificate
-	// should be obtained.
-	// +listType=set
+	// (list) Domains and subdomains covered by the certificate.
 	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
 
 	// (string) Fingerprint of the certificate.
@@ -65,13 +64,11 @@ type CertificateObservation struct {
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
 }
 
-type CertificateParameters struct {
+type CertificateParameters_2 struct {
 
-	// Domain names for which a certificate
-	// should be obtained.
+	// PEM encoded TLS certificate.
 	// +kubebuilder:validation:Optional
-	// +listType=set
-	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
+	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
 
 	// User-defined labels (key-value pairs) the
 	// certificate should be created with.
@@ -82,12 +79,16 @@ type CertificateParameters struct {
 	// Name of the Certificate.
 	// +kubebuilder:validation:Optional
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
+
+	// PEM encoded private key belonging to the certificate.
+	// +kubebuilder:validation:Optional
+	PrivateKeySecretRef v1.SecretKeySelector `json:"privateKeySecretRef" tf:"-"`
 }
 
 // CertificateSpec defines the desired state of Certificate
 type CertificateSpec struct {
 	v1.ResourceSpec `json:",inline"`
-	ForProvider     CertificateParameters `json:"forProvider"`
+	ForProvider     CertificateParameters_2 `json:"forProvider"`
 	// THIS IS A BETA FIELD. It will be honored
 	// unless the Management Policies feature flag is disabled.
 	// InitProvider holds the same fields as ForProvider, with the exception
@@ -98,20 +99,20 @@ type CertificateSpec struct {
 	// required on creation, but we do not desire to update them after creation,
 	// for example because of an external controller is managing them, like an
 	// autoscaler.
-	InitProvider CertificateInitParameters `json:"initProvider,omitempty"`
+	InitProvider CertificateInitParameters_2 `json:"initProvider,omitempty"`
 }
 
 // CertificateStatus defines the observed state of Certificate.
 type CertificateStatus struct {
 	v1.ResourceStatus `json:",inline"`
-	AtProvider        CertificateObservation `json:"atProvider,omitempty"`
+	AtProvider        CertificateObservation_2 `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-// Certificate is the Schema for the Certificates API. Obtain a TLS Certificate managed by Hetzner Cloud.
+// Certificate is the Schema for the Certificates API. Upload a TLS certificate to Hetzner Cloud.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"
@@ -120,8 +121,9 @@ type CertificateStatus struct {
 type Certificate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.domainNames) || (has(self.initProvider) && has(self.initProvider.domainNames))",message="spec.forProvider.domainNames is a required parameter"
+	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.certificate) || (has(self.initProvider) && has(self.initProvider.certificate))",message="spec.forProvider.certificate is a required parameter"
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.name) || (has(self.initProvider) && has(self.initProvider.name))",message="spec.forProvider.name is a required parameter"
+	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.privateKeySecretRef)",message="spec.forProvider.privateKeySecretRef is a required parameter"
 	Spec   CertificateSpec   `json:"spec"`
 	Status CertificateStatus `json:"status,omitempty"`
 }

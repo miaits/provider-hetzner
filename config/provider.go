@@ -15,6 +15,7 @@ import (
 	loadBalancerServiceCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancerservice"
 	loadBalancerTargetCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancertarget"
 	managedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/managedcertificate"
+	uploadedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/uploadedcertificate"
 	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
@@ -31,6 +32,7 @@ import (
 	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
 	loadBalancerTargetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancertarget"
 	managedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/managedcertificate"
+	uploadedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/uploadedcertificate"
 	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
@@ -71,6 +73,7 @@ func GetProvider() *ujconfig.Provider {
 		loadBalancerServiceCluster.Configure,
 		loadBalancerTargetCluster.Configure,
 		managedCertificateCluster.Configure,
+		uploadedCertificateCluster.Configure,
 		firewallCluster.Configure,
 		firewallAttachmentCluster.Configure,
 		floatingIPCluster.Configure,
@@ -110,6 +113,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		loadBalancerServiceNamespaced.Configure,
 		loadBalancerTargetNamespaced.Configure,
 		managedCertificateNamespaced.Configure,
+		uploadedCertificateNamespaced.Configure,
 		firewallNamespaced.Configure,
 		firewallAttachmentNamespaced.Configure,
 		floatingIPNamespaced.Configure,

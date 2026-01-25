@@ -4,14 +4,35 @@ metadata:
   annotations:
     meta.upbound.io/example-id: network/v1alpha1/certificate
   labels:
-    testing.upbound.io/example-name: managed_cert
-  name: managed-cert
+    testing.upbound.io/example-name: sample_certificate
+  name: sample-certificate
 spec:
   forProvider:
-    domainNames:
-    - '*.example.com'
-    - example.com
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIDDTCCAfWgAwIBAgIULTnnk5ygitQ6zmKSq4xkPQRiuHEwDQYJKoZIhvcNAQEL
+      BQAwFjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjYwMTI1MjEwODQzWhcNMjcw
+      MTI1MjEwODQzWjAWMRQwEgYDVQQDDAtleGFtcGxlLmNvbTCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAOOd18X62YXitU1shtJgLPwYrl0TV1WmSTLDP4jU
+      TFwX5IY9gzHanTAmAaskEHlAbZ5drVTVT7eCoUhPOmzi0MDbsTyuEz6o5M/xXNGg
+      RFDTqY2rxOo+HQ89Q7raQjCvsGDj1HIYIsIis/BvSk5agovfEPdmdRvdKae0kbiG
+      AIVkrff8CX2QhEkepKNloXS0RuL9ZoA4Po1YwTw9MylMUCUEPLNX/wYq+egyHmU4
+      6d8eC8Oc0W8ihBt6Y+qQBMQvFR6BpT32pd+1sUXUo+ro5i0313qdy2Ed0aDTYXvQ
+      O3yTKGuVyGmbt0YHt/FohhGapHiJAa1AWlZQuHyuip4MMrECAwEAAaNTMFEwHQYD
+      VR0OBBYEFFpkDwtZXrewGjJliH5OV4bvx/u8MB8GA1UdIwQYMBaAFFpkDwtZXrew
+      GjJliH5OV4bvx/u8MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+      AForVpOQVHAjcYZpD74VocobuHxVfwqNyip5g94xrcIRtYco3Mlyo3vRMLb1I3Zw
+      TyKHup4Pby0fQlKZ/Wx+zQjRNvs3lfTaEHhM65fZUhECOtUK6y2k3xlg5v1iGyrU
+      N40ef7skVVeW11bj+Z0W1+fJxaUPvN+pEB1DEamjkLYAAILkVR6kLo0mPnrOLyKy
+      5oW1DGf+r94Cdto+JHR8U+ppKAKWqZC0YGGIQtwjENgSQ7jHaHZslvzXFzRwYf9X
+      7U7lEoIZqg3+cDRzZO3FHCEAvGYeX857dVEk0wQykL1i2oQOfAJcACM6EDe/RJkR
+      i2jbaEiL0ZgQPNZ9bieIJrI=
+      -----END CERTIFICATE-----
     labels:
       label_1: value_1
       label_2: value_2
-    name: managed_cert
+    name: test-certificate
+    privateKeySecretRef:
+      key: example-key
+      name: example-secret
+      namespace: crossplane-system
