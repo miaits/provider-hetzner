@@ -45,7 +45,7 @@ metadata:
   namespace: crossplane-system
 spec:
   forProvider:
-    location: hel1
+    datacenter: fsn1-dc8
     image: debian-12
     name: node1
     serverType: cx23

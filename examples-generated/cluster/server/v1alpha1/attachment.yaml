@@ -1,0 +1,45 @@
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Attachment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/attachment
+  labels:
+    testing.upbound.io/example-name: fw_ref
+  name: fw-ref
+spec:
+  forProvider:
+    firewallIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: basic_firewall
+    serverIdsRefs:
+    - name: test_server
+
+---
+
+apiVersion: network.hetzner.crossplane.io/v1alpha1
+kind: Firewall
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/attachment
+  labels:
+    testing.upbound.io/example-name: basic_firewall
+  name: basic-firewall
+spec:
+  forProvider:
+    name: basic_firewall
+
+---
+
+apiVersion: server.hetzner.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/attachment
+  labels:
+    testing.upbound.io/example-name: test_server
+  name: test-server
+spec:
+  forProvider:
+    image: ubuntu-24.04
+    name: test-server
+    serverType: cx23
