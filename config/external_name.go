@@ -30,7 +30,9 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	"hcloud_floating_ip_assignment": config.IdentifierFromProvider,
 	"hcloud_server":                 config.IdentifierFromProvider,
 	"hcloud_server_network":         serverNetworkExternalName(),
+	"hcloud_ssh_key":                sshKeyExternalName(),
 	"hcloud_snapshot":               config.IdentifierFromProvider,
+	"hcloud_volume":                 volumeExternalName(),
 }
 
 func idWithStub() config.ExternalName {
@@ -82,6 +84,41 @@ func serverNetworkExternalName() config.ExternalName {
 		}
 		return fn(ctx, externalName, idParams, terraformProviderConfig)
 	}))
+}
+
+func sshKeyExternalName() config.ExternalName {
+	base := config.IdentifierFromProvider
+	return config.NewExternalNameFrom(base, config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
+		if externalName == "" {
+			return "0", nil
+		}
+		return fn(ctx, externalName, parameters, terraformProviderConfig)
+	}))
+}
+
+func volumeExternalName() config.ExternalName {
+	base := config.IdentifierFromProvider
+	return config.NewExternalNameFrom(base,
+		config.WithGetIDFn(func(fn config.GetIDFn, ctx context.Context, externalName string, parameters map[string]any, terraformProviderConfig map[string]any) (string, error) {
+			if externalName == "" {
+				return "0", nil
+			}
+			return fn(ctx, externalName, parameters, terraformProviderConfig)
+		}),
+		config.WithGetExternalNameFn(func(fn config.GetExternalNameFn, tfstate map[string]any) (string, error) {
+			if id, ok := tfstate["id"]; ok {
+				switch v := id.(type) {
+				case string:
+					if v != "" {
+						return v, nil
+					}
+				default:
+					return numericIDToString(v), nil
+				}
+			}
+			return "", fmt.Errorf("cannot find id in tfstate")
+		}),
+	)
 }
 
 func loadBalancerNetworkIDParams(parameters map[string]any) (map[string]any, error) {

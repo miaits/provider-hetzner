@@ -1,0 +1,13 @@
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Key
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/key
+  labels:
+    testing.upbound.io/example-name: main
+  name: main
+  namespace: crossplane-system
+spec:
+  forProvider:
+    name: my-ssh-key
+    publicKey: ${file("~/.ssh/id_ed25519.pub")}

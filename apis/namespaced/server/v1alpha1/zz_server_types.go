@@ -173,7 +173,16 @@ type ServerInitParameters struct {
 	Rescue *string `json:"rescue,omitempty" tf:"rescue,omitempty"`
 
 	// SSH key IDs or names which should be injected into the server at creation time. Once the server is created, you can not update the list of SSH Keys. If you do change this, you will be prompted to destroy and recreate the server. You can avoid this by setting lifecycle.ignore_changes to [ ssh_keys ].
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/namespaced/server/v1alpha1.Key
 	SSHKeys []*string `json:"sshKeys,omitempty" tf:"ssh_keys,omitempty"`
+
+	// References to Key in server to populate sshKeys.
+	// +kubebuilder:validation:Optional
+	SSHKeysRefs []v1.NamespacedReference `json:"sshKeysRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Key in server to populate sshKeys.
+	// +kubebuilder:validation:Optional
+	SSHKeysSelector *v1.NamespacedSelector `json:"sshKeysSelector,omitempty" tf:"-"`
 
 	// Name of the server type this server should be created with.
 	ServerType *string `json:"serverType,omitempty" tf:"server_type,omitempty"`
@@ -375,8 +384,17 @@ type ServerParameters struct {
 	Rescue *string `json:"rescue,omitempty" tf:"rescue,omitempty"`
 
 	// SSH key IDs or names which should be injected into the server at creation time. Once the server is created, you can not update the list of SSH Keys. If you do change this, you will be prompted to destroy and recreate the server. You can avoid this by setting lifecycle.ignore_changes to [ ssh_keys ].
+	// +crossplane:generate:reference:type=github.com/miaits/provider-hetzner/apis/namespaced/server/v1alpha1.Key
 	// +kubebuilder:validation:Optional
 	SSHKeys []*string `json:"sshKeys,omitempty" tf:"ssh_keys,omitempty"`
+
+	// References to Key in server to populate sshKeys.
+	// +kubebuilder:validation:Optional
+	SSHKeysRefs []v1.NamespacedReference `json:"sshKeysRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Key in server to populate sshKeys.
+	// +kubebuilder:validation:Optional
+	SSHKeysSelector *v1.NamespacedSelector `json:"sshKeysSelector,omitempty" tf:"-"`
 
 	// Name of the server type this server should be created with.
 	// +kubebuilder:validation:Optional

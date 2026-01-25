@@ -19,6 +19,9 @@ func (tr *IP) Hub() {}
 func (tr *IPAssignment) Hub() {}
 
 // Hub marks this type as a conversion hub.
+func (tr *Key) Hub() {}
+
+// Hub marks this type as a conversion hub.
 func (tr *Network) Hub() {}
 
 // Hub marks this type as a conversion hub.
@@ -26,3 +29,6 @@ func (tr *Server) Hub() {}
 
 // Hub marks this type as a conversion hub.
 func (tr *Snapshot) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *Volume) Hub() {}

@@ -14,5 +14,8 @@ func Configure(p *config.Provider) {
 		r.References["placement_group_id"] = config.Reference{
 			TerraformName: "hcloud_placement_group",
 		}
+		r.References["ssh_keys"] = config.Reference{
+			TerraformName: "hcloud_ssh_key",
+		}
 	})
 }
