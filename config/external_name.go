@@ -13,18 +13,24 @@ import (
 // provider.
 var ExternalNameConfigs = map[string]config.ExternalName{
 	// Import requires using a randomly generated ID from provider: nl-2e21sda
-	"null_resource":                idWithStub(),
-	"hcloud_network":               config.IdentifierFromProvider,
-	"hcloud_network_subnet":        config.IdentifierFromProvider,
-	"hcloud_network_route":         config.IdentifierFromProvider,
-	"hcloud_load_balancer":         config.IdentifierFromProvider,
-	"hcloud_load_balancer_network": loadBalancerNetworkExternalName(),
-	"hcloud_load_balancer_service": loadBalancerServiceExternalName(),
-	"hcloud_load_balancer_target":  loadBalancerTargetExternalName(),
-	"hcloud_placement_group":       config.IdentifierFromProvider,
-	"hcloud_server":                config.IdentifierFromProvider,
-	"hcloud_server_network":        serverNetworkExternalName(),
-	"hcloud_snapshot":              config.IdentifierFromProvider,
+	"null_resource":                 idWithStub(),
+	"hcloud_network":                config.IdentifierFromProvider,
+	"hcloud_network_subnet":         config.IdentifierFromProvider,
+	"hcloud_network_route":          config.IdentifierFromProvider,
+	"hcloud_load_balancer":          config.IdentifierFromProvider,
+	"hcloud_load_balancer_network":  loadBalancerNetworkExternalName(),
+	"hcloud_load_balancer_service":  loadBalancerServiceExternalName(),
+	"hcloud_load_balancer_target":   loadBalancerTargetExternalName(),
+	"hcloud_managed_certificate":    config.IdentifierFromProvider,
+	"hcloud_uploaded_certificate":   config.IdentifierFromProvider,
+	"hcloud_placement_group":        config.IdentifierFromProvider,
+	"hcloud_firewall":               config.IdentifierFromProvider,
+	"hcloud_firewall_attachment":    config.IdentifierFromProvider,
+	"hcloud_floating_ip":            config.IdentifierFromProvider,
+	"hcloud_floating_ip_assignment": config.IdentifierFromProvider,
+	"hcloud_server":                 config.IdentifierFromProvider,
+	"hcloud_server_network":         serverNetworkExternalName(),
+	"hcloud_snapshot":               config.IdentifierFromProvider,
 }
 
 func idWithStub() config.ExternalName {

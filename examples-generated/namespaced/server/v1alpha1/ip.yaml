@@ -1,0 +1,32 @@
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: IP
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/ip
+  labels:
+    testing.upbound.io/example-name: master
+  name: master
+  namespace: crossplane-system
+spec:
+  forProvider:
+    serverIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: node1
+    type: ipv4
+
+---
+
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: server/v1alpha1/ip
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+  namespace: crossplane-system
+spec:
+  forProvider:
+    image: debian-12
+    name: node1
+    serverType: cx23

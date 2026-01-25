@@ -1,0 +1,43 @@
+apiVersion: network.hetzner.m.crossplane.io/v1alpha1
+kind: Firewall
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/firewall
+  labels:
+    testing.upbound.io/example-name: myfirewall
+  name: myfirewall
+  namespace: crossplane-system
+spec:
+  forProvider:
+    name: my-firewall
+    rule:
+    - direction: in
+      protocol: icmp
+      sourceIps:
+      - 0.0.0.0/0
+      - ::/0
+    - direction: in
+      port: 80-85
+      protocol: tcp
+      sourceIps:
+      - 0.0.0.0/0
+      - ::/0
+
+---
+
+apiVersion: server.hetzner.m.crossplane.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1alpha1/firewall
+  labels:
+    testing.upbound.io/example-name: node1
+  name: node1
+  namespace: crossplane-system
+spec:
+  forProvider:
+    firewallIdsRefs:
+    - name: myfirewall
+    image: debian-12
+    name: node1
+    serverType: cx23

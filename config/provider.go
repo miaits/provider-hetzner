@@ -6,10 +6,15 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
+	firewallCluster "github.com/miaits/provider-hetzner/config/cluster/firewall"
+	firewallAttachmentCluster "github.com/miaits/provider-hetzner/config/cluster/firewallattachment"
+	floatingIPCluster "github.com/miaits/provider-hetzner/config/cluster/floatingip"
+	floatingIPAssignmentCluster "github.com/miaits/provider-hetzner/config/cluster/floatingipassignment"
 	loadBalancerCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancer"
 	loadBalancerNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancernetwork"
 	loadBalancerServiceCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancerservice"
 	loadBalancerTargetCluster "github.com/miaits/provider-hetzner/config/cluster/loadbalancertarget"
+	managedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/managedcertificate"
 	networkCluster "github.com/miaits/provider-hetzner/config/cluster/network"
 	networkRouteCluster "github.com/miaits/provider-hetzner/config/cluster/networkroute"
 	networkSubnetCluster "github.com/miaits/provider-hetzner/config/cluster/networksubnet"
@@ -17,10 +22,16 @@ import (
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
 	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
 	snapshotCluster "github.com/miaits/provider-hetzner/config/cluster/snapshot"
+	uploadedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/uploadedcertificate"
+	firewallNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewall"
+	firewallAttachmentNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewallattachment"
+	floatingIPNamespaced "github.com/miaits/provider-hetzner/config/namespaced/floatingip"
+	floatingIPAssignmentNamespaced "github.com/miaits/provider-hetzner/config/namespaced/floatingipassignment"
 	loadBalancerNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancer"
 	loadBalancerNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancernetwork"
 	loadBalancerServiceNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancerservice"
 	loadBalancerTargetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/loadbalancertarget"
+	managedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/managedcertificate"
 	networkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/network"
 	networkRouteNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networkroute"
 	networkSubnetNamespaced "github.com/miaits/provider-hetzner/config/namespaced/networksubnet"
@@ -28,6 +39,7 @@ import (
 	serverNamespaced "github.com/miaits/provider-hetzner/config/namespaced/server"
 	serverNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/servernetwork"
 	snapshotNamespaced "github.com/miaits/provider-hetzner/config/namespaced/snapshot"
+	uploadedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/uploadedcertificate"
 )
 
 const (
@@ -60,6 +72,12 @@ func GetProvider() *ujconfig.Provider {
 		loadBalancerNetworkCluster.Configure,
 		loadBalancerServiceCluster.Configure,
 		loadBalancerTargetCluster.Configure,
+		managedCertificateCluster.Configure,
+		uploadedCertificateCluster.Configure,
+		firewallCluster.Configure,
+		firewallAttachmentCluster.Configure,
+		floatingIPCluster.Configure,
+		floatingIPAssignmentCluster.Configure,
 		placementGroupCluster.Configure,
 		snapshotCluster.Configure,
 		serverCluster.Configure,
@@ -94,6 +112,12 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		loadBalancerNetworkNamespaced.Configure,
 		loadBalancerServiceNamespaced.Configure,
 		loadBalancerTargetNamespaced.Configure,
+		managedCertificateNamespaced.Configure,
+		uploadedCertificateNamespaced.Configure,
+		firewallNamespaced.Configure,
+		firewallAttachmentNamespaced.Configure,
+		floatingIPNamespaced.Configure,
+		floatingIPAssignmentNamespaced.Configure,
 		placementGroupNamespaced.Configure,
 		snapshotNamespaced.Configure,
 		serverNamespaced.Configure,

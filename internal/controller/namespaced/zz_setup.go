@@ -13,11 +13,16 @@ import (
 	balancernetwork "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancernetwork"
 	balancerservice "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancerservice"
 	balancertarget "github.com/miaits/provider-hetzner/internal/controller/namespaced/loadbalancer/balancertarget"
+	certificate "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/certificate"
+	firewall "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/firewall"
 	network "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/network"
 	route "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/subnet"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/namespaced/providerconfig"
+	attachment "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/attachment"
 	group "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/group"
+	ip "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/ip"
+	ipassignment "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/ipassignment"
 	networkserver "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/server"
 	snapshot "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/snapshot"
@@ -31,11 +36,17 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		balancernetwork.Setup,
 		balancerservice.Setup,
 		balancertarget.Setup,
+		certificate.Setup,
+		certificate.Setup,
+		firewall.Setup,
 		network.Setup,
 		route.Setup,
 		subnet.Setup,
 		providerconfig.Setup,
+		attachment.Setup,
 		group.Setup,
+		ip.Setup,
+		ipassignment.Setup,
 		networkserver.Setup,
 		server.Setup,
 		snapshot.Setup,
@@ -55,11 +66,17 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		balancernetwork.SetupGated,
 		balancerservice.SetupGated,
 		balancertarget.SetupGated,
+		certificate.SetupGated,
+		certificate.SetupGated,
+		firewall.SetupGated,
 		network.SetupGated,
 		route.SetupGated,
 		subnet.SetupGated,
 		providerconfig.SetupGated,
+		attachment.SetupGated,
 		group.SetupGated,
+		ip.SetupGated,
+		ipassignment.SetupGated,
 		networkserver.SetupGated,
 		server.SetupGated,
 		snapshot.SetupGated,
