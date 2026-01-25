@@ -21,10 +21,10 @@ import (
 	placementGroupCluster "github.com/miaits/provider-hetzner/config/cluster/placementgroup"
 	serverCluster "github.com/miaits/provider-hetzner/config/cluster/server"
 	serverNetworkCluster "github.com/miaits/provider-hetzner/config/cluster/servernetwork"
-	sshKeyCluster "github.com/miaits/provider-hetzner/config/cluster/sshkey"
 	snapshotCluster "github.com/miaits/provider-hetzner/config/cluster/snapshot"
-	volumeCluster "github.com/miaits/provider-hetzner/config/cluster/volume"
+	sshKeyCluster "github.com/miaits/provider-hetzner/config/cluster/sshkey"
 	uploadedCertificateCluster "github.com/miaits/provider-hetzner/config/cluster/uploadedcertificate"
+	volumeCluster "github.com/miaits/provider-hetzner/config/cluster/volume"
 	firewallNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewall"
 	firewallAttachmentNamespaced "github.com/miaits/provider-hetzner/config/namespaced/firewallattachment"
 	floatingIPNamespaced "github.com/miaits/provider-hetzner/config/namespaced/floatingip"
@@ -40,10 +40,10 @@ import (
 	placementGroupNamespaced "github.com/miaits/provider-hetzner/config/namespaced/placementgroup"
 	serverNamespaced "github.com/miaits/provider-hetzner/config/namespaced/server"
 	serverNetworkNamespaced "github.com/miaits/provider-hetzner/config/namespaced/servernetwork"
-	sshKeyNamespaced "github.com/miaits/provider-hetzner/config/namespaced/sshkey"
 	snapshotNamespaced "github.com/miaits/provider-hetzner/config/namespaced/snapshot"
-	volumeNamespaced "github.com/miaits/provider-hetzner/config/namespaced/volume"
+	sshKeyNamespaced "github.com/miaits/provider-hetzner/config/namespaced/sshkey"
 	uploadedCertificateNamespaced "github.com/miaits/provider-hetzner/config/namespaced/uploadedcertificate"
+	volumeNamespaced "github.com/miaits/provider-hetzner/config/namespaced/volume"
 )
 
 const (
