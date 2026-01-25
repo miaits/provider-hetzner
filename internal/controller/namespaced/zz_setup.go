@@ -19,6 +19,7 @@ import (
 	subnet "github.com/miaits/provider-hetzner/internal/controller/namespaced/network/subnet"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/namespaced/providerconfig"
 	group "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/group"
+	ip "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/ip"
 	networkserver "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/network"
 	server "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/server"
 	snapshot "github.com/miaits/provider-hetzner/internal/controller/namespaced/server/snapshot"
@@ -38,6 +39,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		subnet.Setup,
 		providerconfig.Setup,
 		group.Setup,
+		ip.Setup,
 		networkserver.Setup,
 		server.Setup,
 		snapshot.Setup,
@@ -63,6 +65,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		subnet.SetupGated,
 		providerconfig.SetupGated,
 		group.SetupGated,
+		ip.SetupGated,
 		networkserver.SetupGated,
 		server.SetupGated,
 		snapshot.SetupGated,
