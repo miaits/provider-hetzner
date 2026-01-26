@@ -4,14 +4,21 @@ metadata:
   annotations:
     meta.upbound.io/example-id: network/v1alpha1/certificate
   labels:
-    testing.upbound.io/example-name: managed_cert
-  name: managed-cert
+    testing.upbound.io/example-name: sample_certificate
+  name: sample-certificate
 spec:
   forProvider:
-    domainNames:
-    - '*.example.com'
-    - example.com
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIDMDCCAhigAwIBAgIIJgROscP8RRUwDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UE
+      ...
+      TKS8gQ==
+      -----END CERTIFICATE-----
     labels:
       label_1: value_1
       label_2: value_2
-    name: managed_cert
+    name: test-certificate-01
+    privateKeySecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
