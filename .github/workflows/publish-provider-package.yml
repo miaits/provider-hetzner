@@ -16,6 +16,7 @@ jobs:
   publish-provider-package:
     uses: crossplane-contrib/provider-workflows/.github/workflows/publish-provider.yml@main
     with:
+      registry_org: miaits
       repository: provider-hetzner
       version: ${{ github.event.inputs.version }}
       go-version: ${{ github.event.inputs.go-version }}
