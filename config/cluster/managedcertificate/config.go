@@ -7,6 +7,7 @@ import (
 // Configure adds configurations for managed certificate cluster.
 func Configure(p *config.Provider) {
 	p.AddResourceConfigurator("hcloud_managed_certificate", func(r *config.Resource) {
+		r.Kind = "ManagedCertificate"
 		r.ShortGroup = "network"
 	})
 }

@@ -17,7 +17,7 @@ spec:
     labels:
       label_1: value_1
       label_2: value_2
-    name: test-certificate-01
+    name: test-certificate-%d
     privateKeySecretRef:
       key: example-key
       name: example-secret

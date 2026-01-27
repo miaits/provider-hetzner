@@ -13,7 +13,7 @@ import (
 	v1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 )
 
-type CertificateInitParameters_2 struct {
+type CertificateInitParameters struct {
 
 	// PEM encoded TLS certificate.
 	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
@@ -30,7 +30,7 @@ type CertificateInitParameters_2 struct {
 	PrivateKeySecretRef v1.SecretKeySelector `json:"privateKeySecretRef" tf:"-"`
 }
 
-type CertificateObservation_2 struct {
+type CertificateObservation struct {
 
 	// PEM encoded TLS certificate.
 	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
@@ -64,7 +64,7 @@ type CertificateObservation_2 struct {
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
 }
 
-type CertificateParameters_2 struct {
+type CertificateParameters struct {
 
 	// PEM encoded TLS certificate.
 	// +kubebuilder:validation:Optional
@@ -88,7 +88,7 @@ type CertificateParameters_2 struct {
 // CertificateSpec defines the desired state of Certificate
 type CertificateSpec struct {
 	v1.ResourceSpec `json:",inline"`
-	ForProvider     CertificateParameters_2 `json:"forProvider"`
+	ForProvider     CertificateParameters `json:"forProvider"`
 	// THIS IS A BETA FIELD. It will be honored
 	// unless the Management Policies feature flag is disabled.
 	// InitProvider holds the same fields as ForProvider, with the exception
@@ -99,13 +99,13 @@ type CertificateSpec struct {
 	// required on creation, but we do not desire to update them after creation,
 	// for example because of an external controller is managing them, like an
 	// autoscaler.
-	InitProvider CertificateInitParameters_2 `json:"initProvider,omitempty"`
+	InitProvider CertificateInitParameters `json:"initProvider,omitempty"`
 }
 
 // CertificateStatus defines the observed state of Certificate.
 type CertificateStatus struct {
 	v1.ResourceStatus `json:",inline"`
-	AtProvider        CertificateObservation_2 `json:"atProvider,omitempty"`
+	AtProvider        CertificateObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true

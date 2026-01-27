@@ -140,8 +140,33 @@ jobs:
       - name: Vendor Dependencies
         run: make vendor vendor.check
 
+      - name: Ignore file mode changes in git diff
+        run: git config core.filemode false
+
       - name: Check Diff
         run: make check-diff
+      - name: Show diff after check-diff failure
+        if: failure()
+        run: |
+          echo "Git status after make check-diff:"
+          git status --porcelain=v1
+          echo ""
+          echo "Git diff (stat):"
+          git --no-pager diff --stat
+          echo ""
+          echo "Git diff (patch):"
+          git --no-pager diff
+
+      - name: Save diff artifact
+        if: failure()
+        run: git --no-pager diff > /tmp/check-diff.patch
+
+      - name: Upload diff artifact
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: check-diff
+          path: /tmp/check-diff.patch
 
   unit-tests:
     runs-on: ubuntu-24.04

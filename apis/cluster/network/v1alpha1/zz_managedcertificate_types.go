@@ -11,13 +11,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	v1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
-	v2 "github.com/crossplane/crossplane-runtime/v2/apis/common/v2"
 )
 
-type CertificateInitParameters struct {
+type ManagedCertificateInitParameters struct {
 
-	// PEM encoded TLS certificate.
-	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
+	// Domain names for which a certificate
+	// should be obtained.
+	// +listType=set
+	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
 
 	// User-defined labels (key-value pairs) the
 	// certificate should be created with.
@@ -26,20 +27,19 @@ type CertificateInitParameters struct {
 
 	// Name of the Certificate.
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
-
-	// PEM encoded private key belonging to the certificate.
-	PrivateKeySecretRef v1.LocalSecretKeySelector `json:"privateKeySecretRef" tf:"-"`
 }
 
-type CertificateObservation struct {
+type ManagedCertificateObservation struct {
 
-	// PEM encoded TLS certificate.
+	// (string) PEM encoded TLS certificate.
 	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
 
 	// (string) Point in time when the Certificate was created at Hetzner Cloud (in ISO-8601 format).
 	Created *string `json:"created,omitempty" tf:"created,omitempty"`
 
-	// (list) Domains and subdomains covered by the certificate.
+	// Domain names for which a certificate
+	// should be obtained.
+	// +listType=set
 	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
 
 	// (string) Fingerprint of the certificate.
@@ -65,11 +65,13 @@ type CertificateObservation struct {
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
 }
 
-type CertificateParameters struct {
+type ManagedCertificateParameters struct {
 
-	// PEM encoded TLS certificate.
+	// Domain names for which a certificate
+	// should be obtained.
 	// +kubebuilder:validation:Optional
-	Certificate *string `json:"certificate,omitempty" tf:"certificate,omitempty"`
+	// +listType=set
+	DomainNames []*string `json:"domainNames,omitempty" tf:"domain_names,omitempty"`
 
 	// User-defined labels (key-value pairs) the
 	// certificate should be created with.
@@ -80,16 +82,12 @@ type CertificateParameters struct {
 	// Name of the Certificate.
 	// +kubebuilder:validation:Optional
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
-
-	// PEM encoded private key belonging to the certificate.
-	// +kubebuilder:validation:Optional
-	PrivateKeySecretRef v1.LocalSecretKeySelector `json:"privateKeySecretRef" tf:"-"`
 }
 
-// CertificateSpec defines the desired state of Certificate
-type CertificateSpec struct {
-	v2.ManagedResourceSpec `json:",inline"`
-	ForProvider            CertificateParameters `json:"forProvider"`
+// ManagedCertificateSpec defines the desired state of ManagedCertificate
+type ManagedCertificateSpec struct {
+	v1.ResourceSpec `json:",inline"`
+	ForProvider     ManagedCertificateParameters `json:"forProvider"`
 	// THIS IS A BETA FIELD. It will be honored
 	// unless the Management Policies feature flag is disabled.
 	// InitProvider holds the same fields as ForProvider, with the exception
@@ -100,52 +98,51 @@ type CertificateSpec struct {
 	// required on creation, but we do not desire to update them after creation,
 	// for example because of an external controller is managing them, like an
 	// autoscaler.
-	InitProvider CertificateInitParameters `json:"initProvider,omitempty"`
+	InitProvider ManagedCertificateInitParameters `json:"initProvider,omitempty"`
 }
 
-// CertificateStatus defines the observed state of Certificate.
-type CertificateStatus struct {
+// ManagedCertificateStatus defines the observed state of ManagedCertificate.
+type ManagedCertificateStatus struct {
 	v1.ResourceStatus `json:",inline"`
-	AtProvider        CertificateObservation `json:"atProvider,omitempty"`
+	AtProvider        ManagedCertificateObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-// Certificate is the Schema for the Certificates API. Upload a TLS certificate to Hetzner Cloud.
+// ManagedCertificate is the Schema for the ManagedCertificates API. Obtain a TLS Certificate managed by Hetzner Cloud.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:scope=Namespaced,categories={crossplane,managed,hetzner}
-type Certificate struct {
+// +kubebuilder:resource:scope=Cluster,categories={crossplane,managed,hetzner}
+type ManagedCertificate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.certificate) || (has(self.initProvider) && has(self.initProvider.certificate))",message="spec.forProvider.certificate is a required parameter"
+	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.domainNames) || (has(self.initProvider) && has(self.initProvider.domainNames))",message="spec.forProvider.domainNames is a required parameter"
 	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.name) || (has(self.initProvider) && has(self.initProvider.name))",message="spec.forProvider.name is a required parameter"
-	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.privateKeySecretRef)",message="spec.forProvider.privateKeySecretRef is a required parameter"
-	Spec   CertificateSpec   `json:"spec"`
-	Status CertificateStatus `json:"status,omitempty"`
+	Spec   ManagedCertificateSpec   `json:"spec"`
+	Status ManagedCertificateStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// CertificateList contains a list of Certificates
-type CertificateList struct {
+// ManagedCertificateList contains a list of ManagedCertificates
+type ManagedCertificateList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Certificate `json:"items"`
+	Items           []ManagedCertificate `json:"items"`
 }
 
 // Repository type metadata.
 var (
-	Certificate_Kind             = "Certificate"
-	Certificate_GroupKind        = schema.GroupKind{Group: CRDGroup, Kind: Certificate_Kind}.String()
-	Certificate_KindAPIVersion   = Certificate_Kind + "." + CRDGroupVersion.String()
-	Certificate_GroupVersionKind = CRDGroupVersion.WithKind(Certificate_Kind)
+	ManagedCertificate_Kind             = "ManagedCertificate"
+	ManagedCertificate_GroupKind        = schema.GroupKind{Group: CRDGroup, Kind: ManagedCertificate_Kind}.String()
+	ManagedCertificate_KindAPIVersion   = ManagedCertificate_Kind + "." + CRDGroupVersion.String()
+	ManagedCertificate_GroupVersionKind = CRDGroupVersion.WithKind(ManagedCertificate_Kind)
 )
 
 func init() {
-	SchemeBuilder.Register(&Certificate{}, &CertificateList{})
+	SchemeBuilder.Register(&ManagedCertificate{}, &ManagedCertificateList{})
 }
