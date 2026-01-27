@@ -14,8 +14,8 @@ import (
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// ResolveReferences of this Attachment.
-func (mg *Attachment) ResolveReferences(ctx context.Context, c client.Reader) error {
+// ResolveReferences of this FirewallAttachment.
+func (mg *FirewallAttachment) ResolveReferences(ctx context.Context, c client.Reader) error {
 	r := reference.NewAPINamespacedResolver(c, mg)
 
 	var rsp reference.NamespacedResolutionResponse

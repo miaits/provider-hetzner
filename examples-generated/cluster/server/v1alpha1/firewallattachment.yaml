@@ -1,8 +1,8 @@
 apiVersion: server.hetzner.crossplane.io/v1alpha1
-kind: Attachment
+kind: FirewallAttachment
 metadata:
   annotations:
-    meta.upbound.io/example-id: server/v1alpha1/attachment
+    meta.upbound.io/example-id: server/v1alpha1/firewallattachment
   labels:
     testing.upbound.io/example-name: fw_ref
   name: fw-ref
@@ -20,7 +20,7 @@ apiVersion: network.hetzner.crossplane.io/v1alpha1
 kind: Firewall
 metadata:
   annotations:
-    meta.upbound.io/example-id: server/v1alpha1/attachment
+    meta.upbound.io/example-id: server/v1alpha1/firewallattachment
   labels:
     testing.upbound.io/example-name: basic_firewall
   name: basic-firewall
@@ -34,7 +34,7 @@ apiVersion: server.hetzner.crossplane.io/v1alpha1
 kind: Server
 metadata:
   annotations:
-    meta.upbound.io/example-id: server/v1alpha1/attachment
+    meta.upbound.io/example-id: server/v1alpha1/firewallattachment
   labels:
     testing.upbound.io/example-name: test_server
   name: test-server

@@ -8,53 +8,53 @@ package v1alpha1
 
 import xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 
-// GetCondition of this Attachment.
-func (mg *Attachment) GetCondition(ct xpv1.ConditionType) xpv1.Condition {
+// GetCondition of this FirewallAttachment.
+func (mg *FirewallAttachment) GetCondition(ct xpv1.ConditionType) xpv1.Condition {
 	return mg.Status.GetCondition(ct)
 }
 
-// GetDeletionPolicy of this Attachment.
-func (mg *Attachment) GetDeletionPolicy() xpv1.DeletionPolicy {
+// GetDeletionPolicy of this FirewallAttachment.
+func (mg *FirewallAttachment) GetDeletionPolicy() xpv1.DeletionPolicy {
 	return mg.Spec.DeletionPolicy
 }
 
-// GetManagementPolicies of this Attachment.
-func (mg *Attachment) GetManagementPolicies() xpv1.ManagementPolicies {
+// GetManagementPolicies of this FirewallAttachment.
+func (mg *FirewallAttachment) GetManagementPolicies() xpv1.ManagementPolicies {
 	return mg.Spec.ManagementPolicies
 }
 
-// GetProviderConfigReference of this Attachment.
-func (mg *Attachment) GetProviderConfigReference() *xpv1.Reference {
+// GetProviderConfigReference of this FirewallAttachment.
+func (mg *FirewallAttachment) GetProviderConfigReference() *xpv1.Reference {
 	return mg.Spec.ProviderConfigReference
 }
 
-// GetWriteConnectionSecretToReference of this Attachment.
-func (mg *Attachment) GetWriteConnectionSecretToReference() *xpv1.SecretReference {
+// GetWriteConnectionSecretToReference of this FirewallAttachment.
+func (mg *FirewallAttachment) GetWriteConnectionSecretToReference() *xpv1.SecretReference {
 	return mg.Spec.WriteConnectionSecretToReference
 }
 
-// SetConditions of this Attachment.
-func (mg *Attachment) SetConditions(c ...xpv1.Condition) {
+// SetConditions of this FirewallAttachment.
+func (mg *FirewallAttachment) SetConditions(c ...xpv1.Condition) {
 	mg.Status.SetConditions(c...)
 }
 
-// SetDeletionPolicy of this Attachment.
-func (mg *Attachment) SetDeletionPolicy(r xpv1.DeletionPolicy) {
+// SetDeletionPolicy of this FirewallAttachment.
+func (mg *FirewallAttachment) SetDeletionPolicy(r xpv1.DeletionPolicy) {
 	mg.Spec.DeletionPolicy = r
 }
 
-// SetManagementPolicies of this Attachment.
-func (mg *Attachment) SetManagementPolicies(r xpv1.ManagementPolicies) {
+// SetManagementPolicies of this FirewallAttachment.
+func (mg *FirewallAttachment) SetManagementPolicies(r xpv1.ManagementPolicies) {
 	mg.Spec.ManagementPolicies = r
 }
 
-// SetProviderConfigReference of this Attachment.
-func (mg *Attachment) SetProviderConfigReference(r *xpv1.Reference) {
+// SetProviderConfigReference of this FirewallAttachment.
+func (mg *FirewallAttachment) SetProviderConfigReference(r *xpv1.Reference) {
 	mg.Spec.ProviderConfigReference = r
 }
 
-// SetWriteConnectionSecretToReference of this Attachment.
-func (mg *Attachment) SetWriteConnectionSecretToReference(r *xpv1.SecretReference) {
+// SetWriteConnectionSecretToReference of this FirewallAttachment.
+func (mg *FirewallAttachment) SetWriteConnectionSecretToReference(r *xpv1.SecretReference) {
 	mg.Spec.WriteConnectionSecretToReference = r
 }
 

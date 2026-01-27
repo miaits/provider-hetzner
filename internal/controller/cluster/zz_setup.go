@@ -20,7 +20,7 @@ import (
 	route "github.com/miaits/provider-hetzner/internal/controller/cluster/network/route"
 	subnet "github.com/miaits/provider-hetzner/internal/controller/cluster/network/subnet"
 	providerconfig "github.com/miaits/provider-hetzner/internal/controller/cluster/providerconfig"
-	attachment "github.com/miaits/provider-hetzner/internal/controller/cluster/server/attachment"
+	firewallattachment "github.com/miaits/provider-hetzner/internal/controller/cluster/server/firewallattachment"
 	group "github.com/miaits/provider-hetzner/internal/controller/cluster/server/group"
 	ip "github.com/miaits/provider-hetzner/internal/controller/cluster/server/ip"
 	ipassignment "github.com/miaits/provider-hetzner/internal/controller/cluster/server/ipassignment"
@@ -46,7 +46,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		route.Setup,
 		subnet.Setup,
 		providerconfig.Setup,
-		attachment.Setup,
+		firewallattachment.Setup,
 		group.Setup,
 		ip.Setup,
 		ipassignment.Setup,
@@ -78,7 +78,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		route.SetupGated,
 		subnet.SetupGated,
 		providerconfig.SetupGated,
-		attachment.SetupGated,
+		firewallattachment.SetupGated,
 		group.SetupGated,
 		ip.SetupGated,
 		ipassignment.SetupGated,

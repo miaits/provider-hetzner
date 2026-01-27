@@ -14,7 +14,7 @@ import (
 	v2 "github.com/crossplane/crossplane-runtime/v2/apis/common/v2"
 )
 
-type AttachmentInitParameters struct {
+type FirewallAttachmentInitParameters struct {
 
 	// ID of the firewall the resources
 	// should be attached to.
@@ -49,7 +49,7 @@ type AttachmentInitParameters struct {
 	ServerIdsSelector *v1.NamespacedSelector `json:"serverIdsSelector,omitempty" tf:"-"`
 }
 
-type AttachmentObservation struct {
+type FirewallAttachmentObservation struct {
 
 	// ID of the firewall the resources
 	// should be attached to.
@@ -69,7 +69,7 @@ type AttachmentObservation struct {
 	ServerIds []*float64 `json:"serverIds,omitempty" tf:"server_ids,omitempty"`
 }
 
-type AttachmentParameters struct {
+type FirewallAttachmentParameters struct {
 
 	// ID of the firewall the resources
 	// should be attached to.
@@ -107,10 +107,10 @@ type AttachmentParameters struct {
 	ServerIdsSelector *v1.NamespacedSelector `json:"serverIdsSelector,omitempty" tf:"-"`
 }
 
-// AttachmentSpec defines the desired state of Attachment
-type AttachmentSpec struct {
+// FirewallAttachmentSpec defines the desired state of FirewallAttachment
+type FirewallAttachmentSpec struct {
 	v2.ManagedResourceSpec `json:",inline"`
-	ForProvider            AttachmentParameters `json:"forProvider"`
+	ForProvider            FirewallAttachmentParameters `json:"forProvider"`
 	// THIS IS A BETA FIELD. It will be honored
 	// unless the Management Policies feature flag is disabled.
 	// InitProvider holds the same fields as ForProvider, with the exception
@@ -121,49 +121,49 @@ type AttachmentSpec struct {
 	// required on creation, but we do not desire to update them after creation,
 	// for example because of an external controller is managing them, like an
 	// autoscaler.
-	InitProvider AttachmentInitParameters `json:"initProvider,omitempty"`
+	InitProvider FirewallAttachmentInitParameters `json:"initProvider,omitempty"`
 }
 
-// AttachmentStatus defines the observed state of Attachment.
-type AttachmentStatus struct {
+// FirewallAttachmentStatus defines the observed state of FirewallAttachment.
+type FirewallAttachmentStatus struct {
 	v1.ResourceStatus `json:",inline"`
-	AtProvider        AttachmentObservation `json:"atProvider,omitempty"`
+	AtProvider        FirewallAttachmentObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-// Attachment is the Schema for the Attachments API. Attaches resources to a Hetzner Cloud Firewall.
+// FirewallAttachment is the Schema for the FirewallAttachments API. Attaches resources to a Hetzner Cloud Firewall.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:resource:scope=Namespaced,categories={crossplane,managed,hetzner}
-type Attachment struct {
+type FirewallAttachment struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              AttachmentSpec   `json:"spec"`
-	Status            AttachmentStatus `json:"status,omitempty"`
+	Spec              FirewallAttachmentSpec   `json:"spec"`
+	Status            FirewallAttachmentStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// AttachmentList contains a list of Attachments
-type AttachmentList struct {
+// FirewallAttachmentList contains a list of FirewallAttachments
+type FirewallAttachmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Attachment `json:"items"`
+	Items           []FirewallAttachment `json:"items"`
 }
 
 // Repository type metadata.
 var (
-	Attachment_Kind             = "Attachment"
-	Attachment_GroupKind        = schema.GroupKind{Group: CRDGroup, Kind: Attachment_Kind}.String()
-	Attachment_KindAPIVersion   = Attachment_Kind + "." + CRDGroupVersion.String()
-	Attachment_GroupVersionKind = CRDGroupVersion.WithKind(Attachment_Kind)
+	FirewallAttachment_Kind             = "FirewallAttachment"
+	FirewallAttachment_GroupKind        = schema.GroupKind{Group: CRDGroup, Kind: FirewallAttachment_Kind}.String()
+	FirewallAttachment_KindAPIVersion   = FirewallAttachment_Kind + "." + CRDGroupVersion.String()
+	FirewallAttachment_GroupVersionKind = CRDGroupVersion.WithKind(FirewallAttachment_Kind)
 )
 
 func init() {
-	SchemeBuilder.Register(&Attachment{}, &AttachmentList{})
+	SchemeBuilder.Register(&FirewallAttachment{}, &FirewallAttachmentList{})
 }
