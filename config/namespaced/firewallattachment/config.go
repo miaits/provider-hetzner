@@ -7,6 +7,7 @@ import (
 // Configure adds configurations for firewall attachment namespaced.
 func Configure(p *config.Provider) {
 	p.AddResourceConfigurator("hcloud_firewall_attachment", func(r *config.Resource) {
+		r.Kind = "FirewallAttachment"
 		r.ShortGroup = "server"
 		r.References["firewall_id"] = config.Reference{
 			TerraformName: "hcloud_firewall",

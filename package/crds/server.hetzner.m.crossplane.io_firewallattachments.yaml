@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: attachments.server.hetzner.m.crossplane.io
+  name: firewallattachments.server.hetzner.m.crossplane.io
 spec:
   group: server.hetzner.m.crossplane.io
   names:
@@ -12,10 +12,10 @@ spec:
     - crossplane
     - managed
     - hetzner
-    kind: Attachment
-    listKind: AttachmentList
-    plural: attachments
-    singular: attachment
+    kind: FirewallAttachment
+    listKind: FirewallAttachmentList
+    plural: firewallattachments
+    singular: firewallattachment
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -34,8 +34,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Attachment is the Schema for the Attachments API. Attaches resources
-          to a Hetzner Cloud Firewall.
+        description: FirewallAttachment is the Schema for the FirewallAttachments
+          API. Attaches resources to a Hetzner Cloud Firewall.
         properties:
           apiVersion:
             description: |-
@@ -55,7 +55,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: AttachmentSpec defines the desired state of Attachment
+            description: FirewallAttachmentSpec defines the desired state of FirewallAttachment
             properties:
               forProvider:
                 properties:
@@ -503,7 +503,7 @@ spec:
             - forProvider
             type: object
           status:
-            description: AttachmentStatus defines the observed state of Attachment.
+            description: FirewallAttachmentStatus defines the observed state of FirewallAttachment.
             properties:
               atProvider:
                 properties:
