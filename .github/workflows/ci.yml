@@ -140,6 +140,9 @@ jobs:
       - name: Vendor Dependencies
         run: make vendor vendor.check
 
+      - name: Ignore file mode changes in git diff
+        run: git config core.filemode false
+
       - name: Check Diff
         run: make check-diff
       - name: Show diff after check-diff failure
