@@ -16,5 +16,7 @@ metadata:
       [readme](https://github.com/miaits/provider-hetzner/blob/main/README.md)
       for instructions.      
 spec:
+  controller:
+    image: ghcr.io/miaits/provider-hetzner
   capabilities:
     - SafeStart
